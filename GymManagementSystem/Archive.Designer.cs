@@ -73,9 +73,9 @@
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnBack.ForeColor = System.Drawing.Color.White;
-            this.btnBack.Location = new System.Drawing.Point(22, 26);
+            this.btnBack.Location = new System.Drawing.Point(12, 24);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(88, 31);
+            this.btnBack.Size = new System.Drawing.Size(100, 42);
             this.btnBack.TabIndex = 5;
             this.btnBack.Text = "BACK";
             this.btnBack.UseVisualStyleBackColor = false;
@@ -149,7 +149,7 @@
             // 
             this.lblCount.AutoSize = true;
             this.lblCount.ForeColor = System.Drawing.Color.Gainsboro;
-            this.lblCount.Location = new System.Drawing.Point(192, 33);
+            this.lblCount.Location = new System.Drawing.Point(183, 34);
             this.lblCount.Name = "lblCount";
             this.lblCount.Size = new System.Drawing.Size(55, 16);
             this.lblCount.TabIndex = 3;
@@ -183,6 +183,7 @@
             this.Name = "Archive";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Archive";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Archive_Load);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();

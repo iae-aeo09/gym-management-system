@@ -20,6 +20,8 @@ namespace GymManagementSystem
         {
 
             InitializeComponent();
+            Resize += Payments_Resize;
+            Shown += Payments_Shown;
 
         }
 
@@ -39,6 +41,8 @@ namespace GymManagementSystem
         {
             InitializeComponent();
             preSelectedMemberId = memberId;
+            Resize += Payments_Resize;
+            Shown += Payments_Shown;
             // in InitializeComponent() after dgvPayments created or in Payments_Load
             this.dgvPayments.AllowUserToAddRows = false;
         }
@@ -215,7 +219,7 @@ namespace GymManagementSystem
 
             string receipt = $@"
 ============================
-   FITPRO GYM SYSTEM
+   VILTRUM GYM MEMBERSHIP
    Official Payment Receipt
 ============================
 Reference : {refNo}
@@ -306,6 +310,93 @@ Status    : PAID ✓
         private void dtpPayDate_ValueChanged(object sender, EventArgs e)
         {
             dtpPayDate.Value = DateTime.Today;
+        }
+
+        private void Payments_Shown(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void Payments_Resize(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            const int outerMargin = 24;
+            const int innerMargin = 24;
+            const int sectionGap = 12;
+            float scale = Math.Max(1.0f, Math.Min(1.25f, ClientSize.Width / 1366f));
+
+            panelPayment.Left = outerMargin;
+            panelPayment.Top = panelHeader.Bottom + 14;
+            panelPayment.Width = Math.Max(980, ClientSize.Width - (outerMargin * 2));
+            panelPayment.Height = 202;
+
+            panelHistory.Left = outerMargin;
+            panelHistory.Top = panelPayment.Bottom + sectionGap;
+            panelHistory.Width = panelPayment.Width;
+            panelHistory.Height = Math.Max(280, ClientSize.Height - panelHistory.Top - outerMargin);
+
+            int topRowY = 68;
+            int rowGap = 52;
+            int columnGap = 40;
+            int leftColumnX = innerMargin;
+            int columnWidth = (panelPayment.ClientSize.Width - (innerMargin * 2) - columnGap) / 2;
+            int rightColumnX = leftColumnX + columnWidth + columnGap;
+
+            lblRef.Location = new Point(Math.Max(innerMargin, panelPayment.ClientSize.Width - innerMargin - lblRef.Width), 12);
+
+            label1.Location = new Point(leftColumnX, topRowY);
+            cmbMember.Location = new Point(leftColumnX + 120, topRowY - 3);
+            cmbMember.Width = Math.Max(220, columnWidth - 130);
+
+            label3.Location = new Point(rightColumnX, topRowY);
+            txtAmount.Location = new Point(rightColumnX + 100, topRowY - 2);
+            txtAmount.Width = Math.Max(200, columnWidth - 110);
+
+            label4.Location = new Point(leftColumnX, topRowY + rowGap);
+            cmbMethod.Location = new Point(leftColumnX + 120, topRowY + rowGap - 3);
+            cmbMethod.Width = Math.Max(220, columnWidth - 130);
+
+            label5.Location = new Point(rightColumnX, topRowY + rowGap);
+            dtpPayDate.Location = new Point(rightColumnX + 100, topRowY + rowGap - 2);
+            dtpPayDate.Width = Math.Max(200, columnWidth - 110);
+
+            int buttonY = topRowY + rowGap + 36;
+            int buttonGap = 12;
+            int availableButtonWidth = panelPayment.ClientSize.Width - (innerMargin * 2);
+            int totalButtonsWidth = Math.Min(900, availableButtonWidth);
+            int buttonStartX = innerMargin + Math.Max(0, (availableButtonWidth - totalButtonsWidth) / 2);
+            int buttonWidth = (totalButtonsWidth - buttonGap) / 2;
+            btnRecordPayment.Location = new Point(buttonStartX, buttonY);
+            btnRecordPayment.Width = Math.Max(260, buttonWidth);
+            btnViewReceipt.Location = new Point(btnRecordPayment.Right + buttonGap, buttonY);
+            btnViewReceipt.Width = Math.Max(260, buttonWidth);
+            btnRecordPayment.Height = (int)(34 * scale);
+            btnViewReceipt.Height = (int)(34 * scale);
+
+            label8.Location = new Point(innerMargin, 18);
+            dgvPayments.Location = new Point(innerMargin, 52);
+            dgvPayments.Size = new Size(
+                Math.Max(860, panelHistory.ClientSize.Width - (innerMargin * 2)),
+                Math.Max(200, panelHistory.ClientSize.Height - 52 - innerMargin));
+
+            var labelFont = new Font("Segoe UI Semibold", 9f * scale, FontStyle.Bold);
+            var buttonFont = new Font("Segoe UI Semibold", 9.5f * scale, FontStyle.Bold);
+            label1.Font = labelFont;
+            label3.Font = labelFont;
+            label4.Font = labelFont;
+            label5.Font = labelFont;
+            label2.Font = new Font("Segoe UI Semibold", 11f * scale, FontStyle.Bold);
+            label8.Font = new Font("Segoe UI Semibold", 11f * scale, FontStyle.Bold);
+            btnRecordPayment.Font = buttonFont;
+            btnViewReceipt.Font = buttonFont;
+            cmbMember.Font = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
+            cmbMethod.Font = cmbMember.Font;
+            txtAmount.Font = cmbMember.Font;
+            dtpPayDate.Font = cmbMember.Font;
         }
     }
     }

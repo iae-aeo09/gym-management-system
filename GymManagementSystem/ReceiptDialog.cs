@@ -81,6 +81,7 @@ namespace GymManagementSystem
             this.rtbReceipt.Location = new Point(24, 100);
             this.rtbReceipt.Name = "rtbReceipt";
             this.rtbReceipt.ReadOnly = true;
+            this.rtbReceipt.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.rtbReceipt.Size = new Size(472, 240);
             this.rtbReceipt.TabIndex = 1;
             this.rtbReceipt.Text = "";
@@ -104,6 +105,7 @@ namespace GymManagementSystem
             this.btnClose.ForeColor = Color.White;
             this.btnClose.Location = new Point(392, 14);
             this.btnClose.Name = "btnClose";
+            this.btnClose.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.btnClose.Size = new Size(104, 30);
             this.btnClose.TabIndex = 0;
             this.btnClose.Text = "Close";
@@ -125,6 +127,7 @@ namespace GymManagementSystem
             this.Name = "ReceiptDialog";
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "Payment Receipt";
+            this.WindowState = FormWindowState.Normal;
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.panelBottom.ResumeLayout(false);

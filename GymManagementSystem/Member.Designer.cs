@@ -77,9 +77,9 @@
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnBack.ForeColor = System.Drawing.Color.White;
-            this.btnBack.Location = new System.Drawing.Point(22, 26);
+            this.btnBack.Location = new System.Drawing.Point(12, 19);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(88, 31);
+            this.btnBack.Size = new System.Drawing.Size(100, 42);
             this.btnBack.TabIndex = 7;
             this.btnBack.Text = "Back";
             this.btnBack.UseVisualStyleBackColor = false;
@@ -172,7 +172,7 @@
             // 
             this.lblMemberCount.AutoSize = true;
             this.lblMemberCount.ForeColor = System.Drawing.Color.Gainsboro;
-            this.lblMemberCount.Location = new System.Drawing.Point(448, 35);
+            this.lblMemberCount.Location = new System.Drawing.Point(458, 37);
             this.lblMemberCount.Name = "lblMemberCount";
             this.lblMemberCount.Size = new System.Drawing.Size(44, 16);
             this.lblMemberCount.TabIndex = 3;
@@ -247,6 +247,7 @@
             this.Name = "Member";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Member";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Member_Load);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();

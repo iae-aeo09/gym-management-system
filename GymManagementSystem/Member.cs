@@ -17,7 +17,8 @@ namespace GymManagementSystem
         public Member()
         {
             InitializeComponent();
-            
+            Resize += Member_Resize;
+            Shown += Member_Shown;
         }
 
         private void Member_Load(object sender, EventArgs e)
@@ -57,10 +58,10 @@ ORDER BY MemberID DESC";
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            AddEditMember form = new AddEditMember();
-            this.Hide();
-            form.ShowDialog();
-            this.Show();
+            using (AddEditMember form = new AddEditMember())
+            {
+                form.ShowDialog(this);
+            }
             LoadMembers();
         }
 
@@ -81,10 +82,10 @@ ORDER BY MemberID DESC";
 
             int id = Convert.ToInt32(dgvMembers.SelectedRows[0].Cells["MemberID"].Value);
 
-            AddEditMember form = new AddEditMember(id);
-            this.Hide();
-            form.ShowDialog();
-            this.Show();
+            using (AddEditMember form = new AddEditMember(id))
+            {
+                form.ShowDialog(this);
+            }
             LoadMembers();
         }
 
@@ -134,11 +135,87 @@ ORDER BY MemberID DESC";
 
             int id = Convert.ToInt32(dgvMembers.SelectedRows[0].Cells["MemberID"].Value);
 
-            Payments payForm = new Payments(id);
-            this.Hide();
-            payForm.ShowDialog();
-            this.Show();
+            using (Payments payForm = new Payments(id))
+            {
+                payForm.ShowDialog(this);
+            }
             LoadMembers();
+        }
+
+        private void Member_Shown(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void Member_Resize(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            const int outerMargin = 24;
+            const int innerMargin = 24;
+            const int rowY = 24;
+            const int rowHeight = 33;
+            const int gap = 10;
+            float scale = Math.Max(1.0f, Math.Min(1.2f, ClientSize.Width / 1366f));
+
+            panelBody.Left = outerMargin;
+            panelBody.Top = panelTop.Bottom + 14;
+            panelBody.Width = Math.Max(980, ClientSize.Width - (outerMargin * 2));
+            panelBody.Height = Math.Max(420, ClientSize.Height - panelBody.Top - outerMargin);
+
+            label2.Location = new Point(innerMargin, rowY + 4);
+
+            int buttonHeight = (int)(34 * scale);
+            btnPay.Height = buttonHeight;
+            btnArchive.Height = buttonHeight;
+            btnUpdate.Height = buttonHeight;
+            btnAdd.Height = buttonHeight;
+
+            FitButtonToText(btnAdd, 24);
+            FitButtonToText(btnUpdate, 24);
+            FitButtonToText(btnArchive, 24);
+            FitButtonToText(btnPay, 24);
+
+            int searchX = label2.Right + 10;
+            int buttonGroupWidth = btnAdd.Width + btnUpdate.Width + btnArchive.Width + btnPay.Width + (gap * 3);
+            int rightEdge = panelBody.ClientSize.Width - innerMargin;
+            int buttonsStartX = rightEdge - buttonGroupWidth;
+            int maxSearchWidth = Math.Max(220, buttonsStartX - searchX - 140);
+            txtSearch.Location = new Point(searchX, rowY + 1);
+            txtSearch.Width = Math.Min(360, maxSearchWidth);
+            txtSearch.Height = (int)(24 * scale);
+
+            btnPay.Location = new Point(rightEdge - btnPay.Width, rowY);
+            btnArchive.Location = new Point(btnPay.Left - gap - btnArchive.Width, rowY);
+            btnUpdate.Location = new Point(btnArchive.Left - gap - btnUpdate.Width, rowY);
+            btnAdd.Location = new Point(btnUpdate.Left - gap - btnAdd.Width, rowY);
+
+            lblMemberCount.Location = new Point(txtSearch.Right + 12, rowY + 8);
+            lblMemberCount.Width = Math.Max(80, btnAdd.Left - lblMemberCount.Left - 10);
+
+            int gridY = rowY + rowHeight + 22;
+            dgvMembers.Location = new Point(innerMargin, gridY);
+            dgvMembers.Size = new Size(
+                Math.Max(860, panelBody.ClientSize.Width - (innerMargin * 2)),
+                Math.Max(240, panelBody.ClientSize.Height - gridY - innerMargin));
+
+            var labelFont = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
+            var buttonFont = new Font("Segoe UI Semibold", 9f * scale, FontStyle.Bold);
+            label2.Font = labelFont;
+            lblMemberCount.Font = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
+            btnAdd.Font = buttonFont;
+            btnUpdate.Font = buttonFont;
+            btnArchive.Font = buttonFont;
+            btnPay.Font = buttonFont;
+        }
+
+        private void FitButtonToText(Button button, int horizontalPadding)
+        {
+            Size measured = TextRenderer.MeasureText(button.Text, button.Font);
+            button.Width = measured.Width + horizontalPadding;
         }
     }
 }

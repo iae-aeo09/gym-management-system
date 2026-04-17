@@ -24,9 +24,8 @@ namespace GymManagementSystem
         {
 
             InitializeComponent();
-
-            
-          
+            Resize += AddEditMember_Resize;
+            Shown += AddEditMember_Shown;
 
         }
         // EDIT (THIS FIXES YOUR ERROR)
@@ -34,6 +33,8 @@ namespace GymManagementSystem
         {
             InitializeComponent();
             memberId = id;
+            Resize += AddEditMember_Resize;
+            Shown += AddEditMember_Shown;
         }
 
 
@@ -230,6 +231,98 @@ namespace GymManagementSystem
         private void cmbPlan_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             cmbPlan_SelectedIndexChanged(sender, e);
+        }
+
+        private void AddEditMember_Shown(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void AddEditMember_Resize(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            int topOffset = panelTop.Bottom;
+            int availableHeight = ClientSize.Height - topOffset;
+            float scale = Math.Max(1.0f, Math.Min(1.22f, ClientSize.Width / 1366f));
+            panelBodyMember.Width = Clamp((int)(ClientSize.Width * 0.44), 560, 920);
+            panelBodyMember.Height = Clamp((int)(availableHeight * 0.68), 420, 700);
+            panelBodyMember.Left = Math.Max(16, (ClientSize.Width - panelBodyMember.Width) / 2);
+            panelBodyMember.Top = topOffset + Math.Max(16, (availableHeight - panelBodyMember.Height) / 2);
+
+            pictureBox1.Left = panelTop.ClientSize.Width - pictureBox1.Width;
+
+            int leftPad = Math.Max(34, (int)(panelBodyMember.Width * 0.08));
+            int labelWidth = Math.Max(120, (int)(panelBodyMember.Width * 0.25));
+            int inputX = leftPad + labelWidth + 20;
+            int inputWidth = Math.Max(220, panelBodyMember.Width - inputX - leftPad);
+
+            int startY = Math.Max(38, (int)(panelBodyMember.Height * 0.12));
+            int rowGap = Math.Max(36, (int)(panelBodyMember.Height * 0.095));
+
+            label1.Location = new Point(leftPad, startY + 3);
+            txtName.Location = new Point(inputX, startY);
+            txtName.Width = inputWidth;
+
+            label2.Location = new Point(leftPad, startY + rowGap + 3);
+            txtEmail.Location = new Point(inputX, startY + rowGap);
+            txtEmail.Width = inputWidth;
+
+            label3.Location = new Point(leftPad, startY + (rowGap * 2) + 3);
+            txtPhone.Location = new Point(inputX, startY + (rowGap * 2));
+            txtPhone.Width = inputWidth;
+
+            label6.Location = new Point(leftPad, startY + (rowGap * 3) + 3);
+            dtpJoinDate.Location = new Point(inputX, startY + (rowGap * 3));
+            dtpJoinDate.Width = inputWidth;
+
+            label5.Location = new Point(leftPad, startY + (rowGap * 4) + 3);
+            txtFee.Location = new Point(inputX, startY + (rowGap * 4));
+            txtFee.Width = inputWidth;
+
+            label4.Location = new Point(leftPad, startY + (rowGap * 5) + 3);
+            cmbPlan.Location = new Point(inputX, startY + (rowGap * 5));
+            cmbPlan.Width = inputWidth;
+
+            txtExpiry.Location = new Point(leftPad, startY + (rowGap * 6) + 3);
+            tbExpiryDate.Location = new Point(inputX, startY + (rowGap * 6));
+            tbExpiryDate.Width = inputWidth;
+
+            int buttonY = Math.Min(panelBodyMember.Height - 54, startY + (rowGap * 7));
+            int buttonWidth = Math.Max(120, (inputWidth - 10) / 2);
+            btnSave.Location = new Point(inputX, buttonY);
+            btnSave.Width = buttonWidth;
+            btnCancel.Location = new Point(inputX + buttonWidth + 10, buttonY);
+            btnCancel.Width = buttonWidth;
+            btnSave.Height = (int)(36 * scale);
+            btnCancel.Height = (int)(36 * scale);
+
+            Font labelFont = new Font("Segoe UI Semibold", 9.5f * scale, FontStyle.Bold);
+            Font inputFont = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
+            label1.Font = labelFont;
+            label2.Font = labelFont;
+            label3.Font = labelFont;
+            label4.Font = labelFont;
+            label5.Font = labelFont;
+            label6.Font = labelFont;
+            txtExpiry.Font = labelFont;
+            txtName.Font = inputFont;
+            txtEmail.Font = inputFont;
+            txtPhone.Font = inputFont;
+            dtpJoinDate.Font = inputFont;
+            txtFee.Font = inputFont;
+            cmbPlan.Font = inputFont;
+            tbExpiryDate.Font = inputFont;
+            btnSave.Font = new Font("Segoe UI Semibold", 9.5f * scale, FontStyle.Bold);
+            btnCancel.Font = btnSave.Font;
+        }
+
+        private int Clamp(int value, int min, int max)
+        {
+            return Math.Min(max, Math.Max(min, value));
         }
     }
 }

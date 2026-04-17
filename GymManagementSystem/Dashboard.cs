@@ -10,6 +10,8 @@ namespace GymManagementSystem
         public Dashboard()
         {
             InitializeComponent();
+            Resize += Dashboard_Resize;
+            Shown += Dashboard_Shown;
         }
 
         private void Dashboard_Load(object sender, EventArgs e)
@@ -116,6 +118,48 @@ namespace GymManagementSystem
         }
 
         private void pnlExpiryAlert_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void Dashboard_Shown(object sender, System.EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void Dashboard_Resize(object sender, System.EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            int contentLeft = panelNav.Right + 12;
+            int contentRight = ClientSize.Width - 12;
+            int contentWidth = System.Math.Max(860, contentRight - contentLeft);
+
+            panelStats.Left = contentLeft;
+            panelStats.Width = contentWidth;
+            pnlExpiryAlert.Left = contentLeft;
+            pnlExpiryAlert.Width = contentWidth;
+            panelGrid.Left = contentLeft;
+            panelGrid.Width = contentWidth;
+
+            int statSegment = panelStats.ClientSize.Width / 4;
+            PositionStat(label1, lblTotalMembers, statSegment, 0);
+            PositionStat(label5, lblActive, statSegment, 1);
+            PositionStat(label6, lblExpired, statSegment, 2);
+            PositionStat(label7, lblRevenue, statSegment, 3);
+        }
+
+        private void PositionStat(Label caption, Label value, int width, int index)
+        {
+            int startX = (width * index) + 20;
+            caption.Left = startX;
+            value.Left = startX;
+        }
+
+        private void lblActive_Click(object sender, EventArgs e)
         {
 
         }

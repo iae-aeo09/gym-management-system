@@ -17,7 +17,8 @@ namespace GymManagementSystem
         public Form1()
         {
             InitializeComponent();
-            
+            Resize += Form1_Resize;
+            Shown += Form1_Shown;
         }
 
         
@@ -75,9 +76,59 @@ namespace GymManagementSystem
             txtPassword.UseSystemPasswordChar = !chkShowPassword.Checked;
         }
 
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            int topOffset = panelTop.Bottom;
+            int availableHeight = ClientSize.Height - topOffset;
+            panelLoginCard.Width = Clamp((int)(ClientSize.Width * 0.40), 480, 760);
+            panelLoginCard.Height = Clamp((int)(availableHeight * 0.52), 360, 520);
+            panelLoginCard.Left = Math.Max(16, (ClientSize.Width - panelLoginCard.Width) / 2);
+            panelLoginCard.Top = topOffset + Math.Max(16, (availableHeight - panelLoginCard.Height) / 2);
+
+            lbGymTitle.Left = Math.Max(pbIcon.Right + 24, (panelTop.ClientSize.Width - lbGymTitle.Width) / 2);
+            label4.Left = Math.Max(pbIcon.Right + 24, (panelTop.ClientSize.Width - label4.Width) / 2);
+
+            int left = 56;
+            int controlWidth = Math.Max(280, panelLoginCard.Width - (left * 2));
+            int y = Math.Max(18, (panelLoginCard.Height - 316) / 2);
+
+            lblCardHeader.Left = Math.Max(16, (panelLoginCard.Width - lblCardHeader.Width) / 2);
+            lblCardHeader.Top = y;
+
+            lbUsername.Location = new Point(left, y + 60);
+            txtUsername.Location = new Point(left, y + 86);
+            txtUsername.Width = controlWidth;
+
+            label3.Location = new Point(left, y + 136);
+            txtPassword.Location = new Point(left, y + 162);
+            txtPassword.Width = controlWidth;
+
+            chkShowPassword.Location = new Point(left, y + 212);
+            btnLogin.Location = new Point(left, y + 248);
+            btnLogin.Width = controlWidth;
+
+            lblError.Location = new Point(left, y + 300);
+            lblError.MaximumSize = new Size(controlWidth, 0);
+        }
+
+        private int Clamp(int value, int min, int max)
+        {
+            return Math.Min(max, Math.Max(min, value));
+        }
+
         private void panelLoginCard_Paint(object sender, PaintEventArgs e)
         {
-            this.Location = new Point(640 - this.Width / 2, 360 - this.Height / 2);
+            // Intentionally empty: dynamic centering is handled via form resize events.
         }
     }
 }

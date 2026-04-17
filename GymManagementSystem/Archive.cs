@@ -16,6 +16,8 @@ namespace GymManagementSystem
         public Archive()
         {
             InitializeComponent();
+            Resize += Archive_Resize;
+            Shown += Archive_Shown;
         }
 
         private void Archive_Load(object sender, EventArgs e)
@@ -40,6 +42,7 @@ namespace GymManagementSystem
                 da.Fill(dt);
 
                 dgvArchived.DataSource = dt;
+                lblCount.Text = $"Total: {dt.Rows.Count}";
             }
         }
 
@@ -86,6 +89,45 @@ namespace GymManagementSystem
         {
             this.Close();
             new Dashboard().Show();
+        }
+
+        private void Archive_Shown(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void Archive_Resize(object sender, EventArgs e)
+        {
+            ApplyResponsiveLayout();
+        }
+
+        private void ApplyResponsiveLayout()
+        {
+            const int outerMargin = 24;
+            const int innerMargin = 24;
+            const int rowY = 24;
+            float scale = Math.Max(1.0f, Math.Min(1.2f, ClientSize.Width / 1366f));
+
+            panelBody.Left = outerMargin;
+            panelBody.Top = panelTop.Bottom + 14;
+            panelBody.Width = Math.Max(980, ClientSize.Width - (outerMargin * 2));
+            panelBody.Height = Math.Max(460, ClientSize.Height - panelBody.Top - outerMargin);
+
+            label2.Location = new Point(innerMargin, rowY + 6);
+            lblCount.Location = new Point(label2.Right + 12, rowY + 9);
+
+            btnRestore.Location = new Point(panelBody.ClientSize.Width - innerMargin - btnRestore.Width, rowY);
+            btnRestore.Height = (int)(36 * scale);
+
+            int gridY = rowY + btnRestore.Height + 20;
+            dgvArchived.Location = new Point(innerMargin, gridY);
+            dgvArchived.Size = new Size(
+                Math.Max(860, panelBody.ClientSize.Width - (innerMargin * 2)),
+                Math.Max(300, panelBody.ClientSize.Height - gridY - innerMargin));
+
+            label2.Font = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
+            lblCount.Font = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
+            btnRestore.Font = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
         }
     }
 }
