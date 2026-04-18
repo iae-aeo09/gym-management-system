@@ -26,6 +26,9 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += AddEditMember_Resize;
             Shown += AddEditMember_Shown;
+            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnSave, Color.FromArgb(57, 130, 245), Color.FromArgb(80, 150, 255));
+            ConfigureButtonTheme(btnCancel, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
 
         }
         // EDIT (THIS FIXES YOUR ERROR)
@@ -35,6 +38,9 @@ namespace GymManagementSystem
             memberId = id;
             Resize += AddEditMember_Resize;
             Shown += AddEditMember_Shown;
+            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnSave, Color.FromArgb(57, 130, 245), Color.FromArgb(80, 150, 255));
+            ConfigureButtonTheme(btnCancel, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
         }
 
 
@@ -43,9 +49,14 @@ namespace GymManagementSystem
             cmbPlan.Items.AddRange(new string[] {
             "Monthly", "Quarterly", "Semi-Annual", "Annual"
         });
-            cmbPlan.SelectedIndex = 0;
+            cmbPlan.SelectedIndex = -1;
+            cmbPlan.Enabled = false;
             dtpJoinDate.Value = DateTime.Today;
-            UpdatePlanDetails();
+            txtName.TextChanged += RequiredDetailsChanged;
+            txtLastName.TextChanged += RequiredDetailsChanged;
+            txtEmail.TextChanged += RequiredDetailsChanged;
+            txtPhone.TextChanged += RequiredDetailsChanged;
+            UpdatePlanAvailability();
 
             if (memberId > 0)
                 LoadMemberData();
@@ -61,7 +72,10 @@ namespace GymManagementSystem
                 var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    txtName.Text = reader["FullName"].ToString();
+                    string fullName = reader["FullName"].ToString();
+                    SplitName(fullName, out string firstName, out string lastName);
+                    txtName.Text = firstName;
+                    txtLastName.Text = lastName;
                     txtEmail.Text = reader["Email"].ToString();
                     txtPhone.Text = reader["Phone"].ToString();
                     cmbPlan.SelectedItem = reader["Plan"].ToString();
@@ -71,6 +85,28 @@ namespace GymManagementSystem
                 }
             }
             UpdatePlanDetails();
+        }
+
+        private void SplitName(string fullName, out string firstName, out string lastName)
+        {
+            fullName = (fullName ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                firstName = string.Empty;
+                lastName = string.Empty;
+                return;
+            }
+
+            string[] parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1)
+            {
+                firstName = parts[0];
+                lastName = string.Empty;
+                return;
+            }
+
+            firstName = parts[0];
+            lastName = string.Join(" ", parts.Skip(1));
         }
 
 
@@ -90,6 +126,13 @@ namespace GymManagementSystem
 
         private void UpdatePlanDetails()
         {
+            if (!cmbPlan.Enabled)
+            {
+                txtFee.Text = string.Empty;
+                tbExpiryDate.Text = string.Empty;
+                return;
+            }
+
             int idx = cmbPlan.SelectedIndex;
             if (idx < 0 || idx >= plans.Length)
             {
@@ -102,7 +145,31 @@ namespace GymManagementSystem
             tbExpiryDate.Text = GetComputedExpiryDate().ToString("MMMM dd, yyyy");
         }
 
-        
+        private bool HasRequiredDetailsForPlan()
+        {
+            return !string.IsNullOrWhiteSpace(txtName.Text)
+                && !string.IsNullOrWhiteSpace(txtLastName.Text)
+                && !string.IsNullOrWhiteSpace(txtEmail.Text)
+                && !string.IsNullOrWhiteSpace(txtPhone.Text);
+        }
+
+        private void UpdatePlanAvailability()
+        {
+            bool canChoosePlan = HasRequiredDetailsForPlan();
+            if (cmbPlan.Enabled == canChoosePlan)
+                return;
+
+            cmbPlan.Enabled = canChoosePlan;
+            if (!canChoosePlan)
+                cmbPlan.SelectedIndex = -1;
+
+            UpdatePlanDetails();
+        }
+
+        private void RequiredDetailsChanged(object sender, EventArgs e)
+        {
+            UpdatePlanAvailability();
+        }
 
         private void dtpJoinDate_ValueChanged_1(object sender, EventArgs e)
         {
@@ -117,7 +184,8 @@ namespace GymManagementSystem
         private bool ValidateMemberInputs()
         {
             var missing = new List<string>();
-            if (string.IsNullOrWhiteSpace(txtName.Text)) missing.Add("Name");
+            if (string.IsNullOrWhiteSpace(txtName.Text)) missing.Add("First Name");
+            if (string.IsNullOrWhiteSpace(txtLastName.Text)) missing.Add("Last Name");
             if (string.IsNullOrWhiteSpace(txtEmail.Text)) missing.Add("Email");
             if (string.IsNullOrWhiteSpace(txtPhone.Text)) missing.Add("Phone");
             if (cmbPlan.SelectedItem == null) missing.Add("Plan");
@@ -172,6 +240,7 @@ namespace GymManagementSystem
             var phoneDigits = GetPhoneDigits();
             DateTime computedExpiry = GetComputedExpiryDate();
             string computedStatus = computedExpiry.Date < DateTime.Today ? "Expired" : "Active";
+            string fullName = $"{txtName.Text.Trim()} {txtLastName.Text.Trim()}".Trim();
 
             using (SqlConnection conn = DBConnection.GetConnection())
             {
@@ -184,7 +253,7 @@ namespace GymManagementSystem
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@n", txtName.Text.Trim());
+                    cmd.Parameters.AddWithValue("@n", fullName);
                     cmd.Parameters.AddWithValue("@e", txtEmail.Text.Trim());
                     cmd.Parameters.AddWithValue("@ph", phoneDigits);
                     cmd.Parameters.AddWithValue("@pl", cmbPlan.SelectedItem.ToString());
@@ -267,31 +336,35 @@ namespace GymManagementSystem
             txtName.Location = new Point(inputX, startY);
             txtName.Width = inputWidth;
 
-            label2.Location = new Point(leftPad, startY + rowGap + 3);
-            txtEmail.Location = new Point(inputX, startY + rowGap);
+            label9.Location = new Point(leftPad, startY + rowGap + 3);
+            txtLastName.Location = new Point(inputX, startY + rowGap);
+            txtLastName.Width = inputWidth;
+
+            label2.Location = new Point(leftPad, startY + (rowGap * 2) + 3);
+            txtEmail.Location = new Point(inputX, startY + (rowGap * 2));
             txtEmail.Width = inputWidth;
 
-            label3.Location = new Point(leftPad, startY + (rowGap * 2) + 3);
-            txtPhone.Location = new Point(inputX, startY + (rowGap * 2));
+            label3.Location = new Point(leftPad, startY + (rowGap * 3) + 3);
+            txtPhone.Location = new Point(inputX, startY + (rowGap * 3));
             txtPhone.Width = inputWidth;
 
-            label6.Location = new Point(leftPad, startY + (rowGap * 3) + 3);
-            dtpJoinDate.Location = new Point(inputX, startY + (rowGap * 3));
+            label6.Location = new Point(leftPad, startY + (rowGap * 4) + 3);
+            dtpJoinDate.Location = new Point(inputX, startY + (rowGap * 4));
             dtpJoinDate.Width = inputWidth;
 
-            label5.Location = new Point(leftPad, startY + (rowGap * 4) + 3);
-            txtFee.Location = new Point(inputX, startY + (rowGap * 4));
+            label5.Location = new Point(leftPad, startY + (rowGap * 5) + 3);
+            txtFee.Location = new Point(inputX, startY + (rowGap * 5));
             txtFee.Width = inputWidth;
 
-            label4.Location = new Point(leftPad, startY + (rowGap * 5) + 3);
-            cmbPlan.Location = new Point(inputX, startY + (rowGap * 5));
+            label4.Location = new Point(leftPad, startY + (rowGap * 6) + 3);
+            cmbPlan.Location = new Point(inputX, startY + (rowGap * 6));
             cmbPlan.Width = inputWidth;
 
-            txtExpiry.Location = new Point(leftPad, startY + (rowGap * 6) + 3);
-            tbExpiryDate.Location = new Point(inputX, startY + (rowGap * 6));
+            txtExpiry.Location = new Point(leftPad, startY + (rowGap * 7) + 3);
+            tbExpiryDate.Location = new Point(inputX, startY + (rowGap * 7));
             tbExpiryDate.Width = inputWidth;
 
-            int buttonY = Math.Min(panelBodyMember.Height - 54, startY + (rowGap * 7));
+            int buttonY = Math.Min(panelBodyMember.Height - 54, startY + (rowGap * 8));
             int buttonWidth = Math.Max(120, (inputWidth - 10) / 2);
             btnSave.Location = new Point(inputX, buttonY);
             btnSave.Width = buttonWidth;
@@ -303,6 +376,7 @@ namespace GymManagementSystem
             Font labelFont = new Font("Segoe UI Semibold", 9.5f * scale, FontStyle.Bold);
             Font inputFont = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
             label1.Font = labelFont;
+            label9.Font = labelFont;
             label2.Font = labelFont;
             label3.Font = labelFont;
             label4.Font = labelFont;
@@ -310,6 +384,7 @@ namespace GymManagementSystem
             label6.Font = labelFont;
             txtExpiry.Font = labelFont;
             txtName.Font = inputFont;
+            txtLastName.Font = inputFont;
             txtEmail.Font = inputFont;
             txtPhone.Font = inputFont;
             dtpJoinDate.Font = inputFont;
@@ -323,6 +398,15 @@ namespace GymManagementSystem
         private int Clamp(int value, int min, int max)
         {
             return Math.Min(max, Math.Max(min, value));
+        }
+
+        private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = hoverColor;
+            button.FlatAppearance.MouseDownBackColor = hoverColor;
+            button.BackColor = baseColor;
         }
     }
 }

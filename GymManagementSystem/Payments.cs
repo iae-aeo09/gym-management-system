@@ -16,19 +16,42 @@ namespace GymManagementSystem
     {
 
         private int preSelectedMemberId = 0;
+        private bool isEmbeddedMode = false;
         public Payments()
         {
 
             InitializeComponent();
             Resize += Payments_Resize;
             Shown += Payments_Shown;
+            dgvPayments.DataBindingComplete += dgvPayments_DataBindingComplete;
+            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnRecordPayment, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
+            ConfigureButtonTheme(btnViewReceipt, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
 
+        }
+
+        public void SetEmbeddedMode()
+        {
+            isEmbeddedMode = true;
+            btnBack.Visible = false;
         }
 
         private void btnBack_Click(object sender, EventArgs e)
         {
+            if (isEmbeddedMode)
+                return;
+
+            var existingDashboard = Application.OpenForms.OfType<Dashboard>().FirstOrDefault();
+            if (existingDashboard != null)
+            {
+                existingDashboard.Show();
+                existingDashboard.BringToFront();
+            }
+            else
+            {
+                new Dashboard().Show();
+            }
             this.Close();
-            new Dashboard().Show();
         }
 
         private void btnBack_Click_1(object sender, EventArgs e)
@@ -43,6 +66,10 @@ namespace GymManagementSystem
             preSelectedMemberId = memberId;
             Resize += Payments_Resize;
             Shown += Payments_Shown;
+            dgvPayments.DataBindingComplete += dgvPayments_DataBindingComplete;
+            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnRecordPayment, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
+            ConfigureButtonTheme(btnViewReceipt, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
             // in InitializeComponent() after dgvPayments created or in Payments_Load
             this.dgvPayments.AllowUserToAddRows = false;
         }
@@ -51,12 +78,13 @@ namespace GymManagementSystem
 
         private void Payments_Load(object sender, EventArgs e)
         {
+            DBConnection.EnsureFeatureSchema();
             cmbMember.SelectedIndexChanged += cmbMember_SelectedIndexChanged;
             cmbMethod.TextChanged += cmbMethod_TextChanged;
             cmbMethod.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbMember.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbMethod.Items.AddRange(new string[] {
-            "Cash", "GCash", "PayPal", "Bank Transfer"
+            "Cash", "GCash", "Maya", "Credit Card", "Bank Transfer"
         });
             cmbMethod.SelectedIndex = 0;
             dtpPayDate.Value = DateTime.Today;
@@ -85,7 +113,7 @@ namespace GymManagementSystem
             {
                 conn.Open();
                 SqlDataAdapter da = new SqlDataAdapter(
-                    "SELECT MemberID, FullName, [Plan], MembershipFee, Email FROM Members WHERE IsArchived=0", conn);
+                    "SELECT MemberID, FullName, [Plan], MembershipFee, Email, ExpiryDate, IsPaid FROM Members WHERE IsArchived=0", conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 cmbMember.DataSource = dt;
@@ -131,6 +159,20 @@ namespace GymManagementSystem
             }
         }
 
+        private int GetPlanMonths(DataRowView row)
+        {
+            if (row == null) return 0;
+            string plan = (row["Plan"]?.ToString() ?? string.Empty).Trim();
+            switch (plan)
+            {
+                case "Monthly": return 1;
+                case "Quarterly": return 3;
+                case "Semi-Annual": return 6;
+                case "Annual": return 12;
+                default: return 0;
+            }
+        }
+
         private void UpdateAmountState()
         {
             bool isCash = string.Equals(cmbMethod.SelectedItem?.ToString(), "Cash", StringComparison.OrdinalIgnoreCase);
@@ -152,13 +194,16 @@ namespace GymManagementSystem
             using (SqlConnection conn = DBConnection.GetConnection())
             {
                 conn.Open();
-                string query = @"SELECT ReferenceNo, MemberName, Amount, 
-                             PaymentMethod, PaymentDate, Status 
-                             FROM Payments ORDER BY PaymentID DESC";
+                string query = @"SELECT p.ReferenceNo, p.MemberName, p.Amount,
+                             p.PaymentMethod, p.PaymentDate, m.ExpiryDate, p.Status
+                             FROM Payments p
+                             LEFT JOIN Members m ON p.MemberID = m.MemberID
+                             ORDER BY p.PaymentID DESC";
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 dgvPayments.DataSource = dt;
+                ApplyPaymentGridHighlights();
             }
         }
 
@@ -217,20 +262,15 @@ namespace GymManagementSystem
                 return;
             }
 
-            string receipt = $@"
-============================
-   VILTRUM GYM MEMBERSHIP
-   Official Payment Receipt
-============================
-Reference : {refNo}
-Member    : {memberName}
-Amount    : ₱{amount:N2}
-Method    : {method}
-Date      : {date:MMMM dd, yyyy}
-Status    : PAID ✓
-============================";
-
-            ReceiptDialog.ShowReceipt(this, receipt);
+            ReceiptDialog.ShowReceipt(this, new ReceiptInfo
+            {
+                ReferenceNo = refNo,
+                MemberName = memberName,
+                Amount = amount,
+                PaymentMethod = method,
+                PaymentDate = date,
+                Status = "Paid"
+            });
         }
 
         private void btnRecordPayment_Click_1(object sender, EventArgs e)
@@ -254,34 +294,86 @@ Status    : PAID ✓
             string method = cmbMethod.SelectedItem.ToString();
             string refNo = GenerateRef();
             DateTime payDate = dtpPayDate.Value.Date;
+            DateTime expiryDate = Convert.ToDateTime(((DataRowView)cmbMember.SelectedItem)["ExpiryDate"]).Date;
+            bool isPaid = Convert.ToBoolean(((DataRowView)cmbMember.SelectedItem)["IsPaid"]);
+            DataRowView selectedMember = (DataRowView)cmbMember.SelectedItem;
+            decimal expectedAmount = GetPlanAmount(selectedMember);
+            int renewalMonths = GetPlanMonths(selectedMember);
+
+            if (expiryDate >= DateTime.Today && isPaid)
+            {
+                MessageBox.Show(
+                    $"Cannot record payment.\nThis member is already paid and active until {expiryDate:MMMM dd, yyyy}.",
+                    "Payment Blocked",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (amount < expectedAmount)
+            {
+                MessageBox.Show(
+                    $"Entered amount is below required plan amount.\nRequired: ₱{expectedAmount:N2}",
+                    "Invalid Payment Amount",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (amount > expectedAmount)
+            {
+                DialogResult confirmOverpay = MessageBox.Show(
+                    $"Entered amount exceeds plan amount (₱{expectedAmount:N2}).\nContinue anyway?",
+                    "Amount Validation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                if (confirmOverpay != DialogResult.Yes)
+                    return;
+            }
 
             using (SqlConnection conn = DBConnection.GetConnection())
             {
                 conn.Open();
+                SqlTransaction tx = conn.BeginTransaction();
+                try
+                {
+                    // Insert payment record
+                    SqlCommand cmd = new SqlCommand(@"
+INSERT INTO Payments (MemberID, MemberName, Amount, PaymentMethod, PaymentDate, ReferenceNo, Status)
+VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
+                    cmd.Parameters.AddWithValue("@mid", memberId);
+                    cmd.Parameters.AddWithValue("@mn", memberName);
+                    cmd.Parameters.AddWithValue("@amt", amount);
+                    cmd.Parameters.AddWithValue("@mth", method);
+                    cmd.Parameters.AddWithValue("@dt", payDate);
+                    cmd.Parameters.AddWithValue("@ref", refNo);
+                    cmd.ExecuteNonQuery();
 
-                // Insert payment record
-                SqlCommand cmd = new SqlCommand(@"
-            INSERT INTO Payments (MemberID, MemberName, Amount, PaymentMethod, PaymentDate, ReferenceNo, Status)
-            VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn);
-                cmd.Parameters.AddWithValue("@mid", memberId);
-                cmd.Parameters.AddWithValue("@mn", memberName);
-                cmd.Parameters.AddWithValue("@amt", amount);
-                cmd.Parameters.AddWithValue("@mth", method);
-                cmd.Parameters.AddWithValue("@dt", payDate);
-                cmd.Parameters.AddWithValue("@ref", refNo);
-                cmd.ExecuteNonQuery();
+                    DateTime renewalBase = expiryDate >= DateTime.Today ? expiryDate : DateTime.Today;
+                    DateTime renewedExpiry = renewalMonths > 0 ? renewalBase.AddMonths(renewalMonths) : renewalBase;
 
-                // Mark member as paid, but keep status based on expiry date.
-                SqlCommand upd = new SqlCommand(
-                    @"UPDATE Members
-                      SET IsPaid=1,
-                          Status = CASE 
-                              WHEN CAST(ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Expired'
-                              ELSE 'Active'
-                          END
-                      WHERE MemberID=@id", conn);
-                upd.Parameters.AddWithValue("@id", memberId);
-                upd.ExecuteNonQuery();
+                    // Auto-renew membership on successful payment.
+                    SqlCommand upd = new SqlCommand(
+                        @"UPDATE Members
+                          SET IsPaid=1,
+                              ExpiryDate=@newExpiry,
+                              Status = CASE 
+                                  WHEN IsFrozen=1 THEN 'Frozen'
+                                  WHEN CAST(@newExpiry AS date) < CAST(GETDATE() AS date) THEN 'Expired'
+                                  ELSE 'Active'
+                              END
+                          WHERE MemberID=@id", conn, tx);
+                    upd.Parameters.AddWithValue("@newExpiry", renewedExpiry);
+                    upd.Parameters.AddWithValue("@id", memberId);
+                    upd.ExecuteNonQuery();
+
+                    tx.Commit();
+                }
+                catch
+                {
+                    tx.Rollback();
+                    throw;
+                }
             }
 
             // send receipt after payment is recorded
@@ -293,7 +385,7 @@ Status    : PAID ✓
             {
                 try
                 {
-                    EmailHelper.SendReceipt(email, refNo, memberName, amount, method);
+                    EmailHelper.SendReceipt(email, refNo, memberName, amount, method, payDate);
                 }
                 catch (Exception ex)
                 {
@@ -320,6 +412,46 @@ Status    : PAID ✓
         private void Payments_Resize(object sender, EventArgs e)
         {
             ApplyResponsiveLayout();
+        }
+
+        private void dgvPayments_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            ApplyPaymentGridHighlights();
+        }
+
+        private void ApplyPaymentGridHighlights()
+        {
+            if (dgvPayments.Rows.Count == 0 || !dgvPayments.Columns.Contains("ExpiryDate"))
+                return;
+
+            foreach (DataGridViewRow row in dgvPayments.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                DateTime expiryDate;
+                bool hasDate = DateTime.TryParse(row.Cells["ExpiryDate"].Value?.ToString(), out expiryDate);
+                if (!hasDate) continue;
+
+                if (expiryDate.Date < DateTime.Today)
+                {
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(96, 50, 58);
+                    row.DefaultCellStyle.SelectionBackColor = Color.FromArgb(126, 60, 70);
+                }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(45, 55, 72);
+                    row.DefaultCellStyle.SelectionBackColor = Color.FromArgb(78, 89, 107);
+                }
+            }
+        }
+
+        private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = hoverColor;
+            button.FlatAppearance.MouseDownBackColor = hoverColor;
+            button.BackColor = baseColor;
         }
 
         private void ApplyResponsiveLayout()
@@ -399,6 +531,4 @@ Status    : PAID ✓
             dtpPayDate.Font = cmbMember.Font;
         }
     }
-    }
-    
-
+}

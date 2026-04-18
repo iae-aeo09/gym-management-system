@@ -157,16 +157,16 @@
             // 
             // btnRestore
             // 
-            this.btnRestore.BackColor = System.Drawing.Color.LimeGreen;
+            this.btnRestore.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(57)))), ((int)(((byte)(130)))), ((int)(((byte)(245)))));
             this.btnRestore.FlatAppearance.BorderSize = 0;
             this.btnRestore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRestore.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRestore.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRestore.ForeColor = System.Drawing.Color.White;
             this.btnRestore.Location = new System.Drawing.Point(816, 33);
             this.btnRestore.Name = "btnRestore";
-            this.btnRestore.Size = new System.Drawing.Size(161, 41);
+            this.btnRestore.Size = new System.Drawing.Size(161, 38);
             this.btnRestore.TabIndex = 1;
-            this.btnRestore.Text = "RESTORE SELECTED";
+            this.btnRestore.Text = "RESTORE";
             this.btnRestore.UseVisualStyleBackColor = false;
             this.btnRestore.Click += new System.EventHandler(this.btnRestore_Click);
             // 

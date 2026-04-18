@@ -91,47 +91,48 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Font = new System.Drawing.Font("Cascadia Code", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label4.Location = new System.Drawing.Point(203, 29);
+            this.label4.Location = new System.Drawing.Point(539, 9);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(204, 28);
+            this.label4.Size = new System.Drawing.Size(340, 45);
             this.label4.TabIndex = 12;
             this.label4.Text = "TODAY, WE BECOME";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Font = new System.Drawing.Font("Cascadia Code", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.Red;
-            this.label2.Location = new System.Drawing.Point(413, 29);
+            this.label2.Location = new System.Drawing.Point(885, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(122, 28);
+            this.label2.Size = new System.Drawing.Size(200, 45);
             this.label2.TabIndex = 16;
             this.label2.Text = "STRONGER.";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Font = new System.Drawing.Font("Cascadia Code", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label9.Location = new System.Drawing.Point(203, 57);
+            this.label9.Location = new System.Drawing.Point(539, 45);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(249, 28);
+            this.label9.Size = new System.Drawing.Size(460, 45);
             this.label9.TabIndex = 17;
             this.label9.Text = "NO LIMITS. NO EXCUSES.";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
-            this.label3.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold);
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.label3.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label3.Location = new System.Drawing.Point(-1, 14);
+            this.label3.Location = new System.Drawing.Point(28, 14);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(200, 41);
+            this.label3.Size = new System.Drawing.Size(139, 51);
             this.label3.TabIndex = 11;
             this.label3.Text = "DASHBOARD";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // btnLogout
             // 
@@ -169,7 +170,7 @@
             this.btnGoMembers.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGoMembers.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGoMembers.ForeColor = System.Drawing.Color.White;
-            this.btnGoMembers.Location = new System.Drawing.Point(28, 71);
+            this.btnGoMembers.Location = new System.Drawing.Point(28, 77);
             this.btnGoMembers.Name = "btnGoMembers";
             this.btnGoMembers.Size = new System.Drawing.Size(139, 51);
             this.btnGoMembers.TabIndex = 7;
@@ -184,7 +185,7 @@
             this.btnGoPayments.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGoPayments.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGoPayments.ForeColor = System.Drawing.Color.White;
-            this.btnGoPayments.Location = new System.Drawing.Point(28, 139);
+            this.btnGoPayments.Location = new System.Drawing.Point(28, 140);
             this.btnGoPayments.Name = "btnGoPayments";
             this.btnGoPayments.Size = new System.Drawing.Size(139, 51);
             this.btnGoPayments.TabIndex = 8;
@@ -418,7 +419,6 @@
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
             this.panelNav.ResumeLayout(false);
-            this.panelNav.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvRecentPayments)).EndInit();
             this.panelStats.ResumeLayout(false);
             this.panelStats.PerformLayout();

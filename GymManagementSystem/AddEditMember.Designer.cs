@@ -46,10 +46,12 @@
             this.panelBodyMember = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.txtLastName = new System.Windows.Forms.TextBox();
             this.txtExpiry = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -131,7 +133,7 @@
             this.txtPhone.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
             this.txtPhone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPhone.ForeColor = System.Drawing.Color.White;
-            this.txtPhone.Location = new System.Drawing.Point(243, 132);
+            this.txtPhone.Location = new System.Drawing.Point(243, 176);
             this.txtPhone.Name = "txtPhone";
             this.txtPhone.Size = new System.Drawing.Size(253, 22);
             this.txtPhone.TabIndex = 1;
@@ -141,7 +143,7 @@
             this.txtEmail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
             this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtEmail.ForeColor = System.Drawing.Color.White;
-            this.txtEmail.Location = new System.Drawing.Point(243, 88);
+            this.txtEmail.Location = new System.Drawing.Point(243, 132);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.Size = new System.Drawing.Size(253, 22);
             this.txtEmail.TabIndex = 2;
@@ -152,7 +154,7 @@
             this.cmbPlan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbPlan.ForeColor = System.Drawing.Color.White;
             this.cmbPlan.FormattingEnabled = true;
-            this.cmbPlan.Location = new System.Drawing.Point(243, 240);
+            this.cmbPlan.Location = new System.Drawing.Point(243, 284);
             this.cmbPlan.Name = "cmbPlan";
             this.cmbPlan.Size = new System.Drawing.Size(253, 24);
             this.cmbPlan.TabIndex = 3;
@@ -163,7 +165,7 @@
             this.txtFee.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(58)))), ((int)(((byte)(76)))));
             this.txtFee.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFee.ForeColor = System.Drawing.Color.Gainsboro;
-            this.txtFee.Location = new System.Drawing.Point(243, 201);
+            this.txtFee.Location = new System.Drawing.Point(243, 245);
             this.txtFee.Name = "txtFee";
             this.txtFee.ReadOnly = true;
             this.txtFee.Size = new System.Drawing.Size(253, 22);
@@ -171,7 +173,7 @@
             // 
             // dtpJoinDate
             // 
-            this.dtpJoinDate.Location = new System.Drawing.Point(243, 165);
+            this.dtpJoinDate.Location = new System.Drawing.Point(243, 209);
             this.dtpJoinDate.Name = "dtpJoinDate";
             this.dtpJoinDate.Size = new System.Drawing.Size(253, 22);
             this.dtpJoinDate.TabIndex = 5;
@@ -182,7 +184,7 @@
             this.tbExpiryDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(58)))), ((int)(((byte)(76)))));
             this.tbExpiryDate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbExpiryDate.ForeColor = System.Drawing.Color.Gainsboro;
-            this.tbExpiryDate.Location = new System.Drawing.Point(243, 278);
+            this.tbExpiryDate.Location = new System.Drawing.Point(243, 322);
             this.tbExpiryDate.Name = "tbExpiryDate";
             this.tbExpiryDate.ReadOnly = true;
             this.tbExpiryDate.Size = new System.Drawing.Size(253, 22);
@@ -195,7 +197,7 @@
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSave.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(243, 332);
+            this.btnSave.Location = new System.Drawing.Point(243, 366);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(121, 34);
             this.btnSave.TabIndex = 7;
@@ -210,24 +212,26 @@
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(375, 332);
+            this.btnCancel.Location = new System.Drawing.Point(375, 366);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(121, 34);
             this.btnCancel.TabIndex = 8;
-            this.btnCancel.Text = "Cancel";
+            this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // panelBodyMember
             // 
-            this.panelBodyMember.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(57)))), ((int)(((byte)(74)))));
+            this.panelBodyMember.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(52)))), ((int)(((byte)(68)))));
             this.panelBodyMember.Controls.Add(this.label1);
             this.panelBodyMember.Controls.Add(this.label2);
+            this.panelBodyMember.Controls.Add(this.label9);
             this.panelBodyMember.Controls.Add(this.label3);
             this.panelBodyMember.Controls.Add(this.label4);
             this.panelBodyMember.Controls.Add(this.label5);
             this.panelBodyMember.Controls.Add(this.label6);
             this.panelBodyMember.Controls.Add(this.txtName);
+            this.panelBodyMember.Controls.Add(this.txtLastName);
             this.panelBodyMember.Controls.Add(this.txtEmail);
             this.panelBodyMember.Controls.Add(this.txtPhone);
             this.panelBodyMember.Controls.Add(this.dtpJoinDate);
@@ -239,7 +243,7 @@
             this.panelBodyMember.Controls.Add(this.btnCancel);
             this.panelBodyMember.Location = new System.Drawing.Point(365, 156);
             this.panelBodyMember.Name = "panelBodyMember";
-            this.panelBodyMember.Size = new System.Drawing.Size(550, 407);
+            this.panelBodyMember.Size = new System.Drawing.Size(550, 446);
             this.panelBodyMember.TabIndex = 1;
             // 
             // label1
@@ -248,25 +252,35 @@
             this.label1.ForeColor = System.Drawing.Color.Gainsboro;
             this.label1.Location = new System.Drawing.Point(44, 46);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 16);
+            this.label1.Size = new System.Drawing.Size(72, 16);
             this.label1.TabIndex = 9;
-            this.label1.Text = "Full Name";
+            this.label1.Text = "First Name";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label2.Location = new System.Drawing.Point(44, 90);
+            this.label2.Location = new System.Drawing.Point(44, 134);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 16);
             this.label2.TabIndex = 10;
             this.label2.Text = "Email";
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.ForeColor = System.Drawing.Color.Gainsboro;
+            this.label9.Location = new System.Drawing.Point(44, 90);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(72, 16);
+            this.label9.TabIndex = 16;
+            this.label9.Text = "Last Name";
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label3.Location = new System.Drawing.Point(44, 134);
+            this.label3.Location = new System.Drawing.Point(44, 178);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(46, 16);
             this.label3.TabIndex = 11;
@@ -276,7 +290,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label4.Location = new System.Drawing.Point(44, 242);
+            this.label4.Location = new System.Drawing.Point(44, 286);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(34, 16);
             this.label4.TabIndex = 12;
@@ -286,7 +300,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label5.Location = new System.Drawing.Point(44, 203);
+            this.label5.Location = new System.Drawing.Point(44, 247);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(31, 16);
             this.label5.TabIndex = 13;
@@ -296,18 +310,28 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label6.Location = new System.Drawing.Point(44, 167);
+            this.label6.Location = new System.Drawing.Point(44, 211);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(64, 16);
             this.label6.TabIndex = 14;
             this.label6.Text = "Start date";
             this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
+            // txtLastName
+            // 
+            this.txtLastName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtLastName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtLastName.ForeColor = System.Drawing.Color.White;
+            this.txtLastName.Location = new System.Drawing.Point(243, 88);
+            this.txtLastName.Name = "txtLastName";
+            this.txtLastName.Size = new System.Drawing.Size(253, 22);
+            this.txtLastName.TabIndex = 17;
+            // 
             // txtExpiry
             // 
             this.txtExpiry.AutoSize = true;
             this.txtExpiry.ForeColor = System.Drawing.Color.Gainsboro;
-            this.txtExpiry.Location = new System.Drawing.Point(44, 281);
+            this.txtExpiry.Location = new System.Drawing.Point(44, 325);
             this.txtExpiry.Name = "txtExpiry";
             this.txtExpiry.Size = new System.Drawing.Size(76, 16);
             this.txtExpiry.TabIndex = 15;
@@ -355,11 +379,13 @@
         private System.Windows.Forms.Panel panelBodyMember;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label txtExpiry;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TextBox txtLastName;
     }
 }

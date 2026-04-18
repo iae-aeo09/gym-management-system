@@ -12,6 +12,7 @@ namespace GymManagementSystem
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                DBConnection.EnsureFeatureSchema();
                 Application.Run(new Form1());
             }
             catch (Exception ex)

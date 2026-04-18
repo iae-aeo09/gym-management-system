@@ -19,6 +19,7 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += Form1_Resize;
             Shown += Form1_Shown;
+            ConfigureButtonTheme(btnLogin, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
         }
 
         
@@ -49,7 +50,16 @@ namespace GymManagementSystem
 
                     if (result > 0)
                     {
-                        new Dashboard().Show();
+                        var existingDashboard = Application.OpenForms.OfType<Dashboard>().FirstOrDefault();
+                        if (existingDashboard != null)
+                        {
+                            existingDashboard.Show();
+                            existingDashboard.BringToFront();
+                        }
+                        else
+                        {
+                            new Dashboard().Show();
+                        }
                         this.Hide();
                     }
                     else
@@ -90,8 +100,9 @@ namespace GymManagementSystem
         {
             int topOffset = panelTop.Bottom;
             int availableHeight = ClientSize.Height - topOffset;
+            float scale = Math.Max(1.0f, Math.Min(1.18f, ClientSize.Width / 1366f));
             panelLoginCard.Width = Clamp((int)(ClientSize.Width * 0.40), 480, 760);
-            panelLoginCard.Height = Clamp((int)(availableHeight * 0.52), 360, 520);
+            panelLoginCard.Height = Clamp((int)(availableHeight * 0.56), 380, 540);
             panelLoginCard.Left = Math.Max(16, (ClientSize.Width - panelLoginCard.Width) / 2);
             panelLoginCard.Top = topOffset + Math.Max(16, (availableHeight - panelLoginCard.Height) / 2);
 
@@ -119,6 +130,16 @@ namespace GymManagementSystem
 
             lblError.Location = new Point(left, y + 300);
             lblError.MaximumSize = new Size(controlWidth, 0);
+
+            lbGymTitle.Font = new Font("Segoe UI Semibold", 20f * scale, FontStyle.Bold);
+            label4.Font = new Font("Segoe UI", 10f * scale, FontStyle.Bold);
+            lblCardHeader.Font = new Font("Segoe UI Semibold", 14f * scale, FontStyle.Bold);
+            lbUsername.Font = new Font("Segoe UI Semibold", 9.5f * scale, FontStyle.Bold);
+            label3.Font = lbUsername.Font;
+            txtUsername.Font = new Font("Segoe UI", 10f * scale, FontStyle.Regular);
+            txtPassword.Font = txtUsername.Font;
+            chkShowPassword.Font = new Font("Segoe UI", 8.8f * scale, FontStyle.Regular);
+            btnLogin.Font = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
         }
 
         private int Clamp(int value, int min, int max)
@@ -129,6 +150,20 @@ namespace GymManagementSystem
         private void panelLoginCard_Paint(object sender, PaintEventArgs e)
         {
             // Intentionally empty: dynamic centering is handled via form resize events.
+        }
+
+        private void pbIcon_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = hoverColor;
+            button.FlatAppearance.MouseDownBackColor = hoverColor;
+            button.BackColor = baseColor;
         }
     }
 }

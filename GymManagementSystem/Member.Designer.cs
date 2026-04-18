@@ -42,6 +42,8 @@
             this.btnArchive = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.btnReminders = new System.Windows.Forms.Button();
+            this.btnFreeze = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMembers)).BeginInit();
@@ -135,6 +137,8 @@
             this.panelBody.Controls.Add(this.btnArchive);
             this.panelBody.Controls.Add(this.btnUpdate);
             this.panelBody.Controls.Add(this.btnAdd);
+            this.panelBody.Controls.Add(this.btnReminders);
+            this.panelBody.Controls.Add(this.btnFreeze);
             this.panelBody.Controls.Add(this.txtSearch);
             this.panelBody.Controls.Add(this.dgvMembers);
             this.panelBody.Location = new System.Drawing.Point(129, 100);
@@ -200,11 +204,11 @@
             this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpdate.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
             this.btnUpdate.ForeColor = System.Drawing.Color.White;
-            this.btnUpdate.Location = new System.Drawing.Point(694, 27);
+            this.btnUpdate.Location = new System.Drawing.Point(688, 27);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(90, 33);
             this.btnUpdate.TabIndex = 4;
-            this.btnUpdate.Text = "UPDATE";
+            this.btnUpdate.Text = "RENEW";
             this.btnUpdate.UseVisualStyleBackColor = false;
             this.btnUpdate.Click += new System.EventHandler(this.btnEdit_Click);
             // 
@@ -215,13 +219,43 @@
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(549, 27);
+            this.btnAdd.Location = new System.Drawing.Point(472, 27);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(134, 33);
             this.btnAdd.TabIndex = 2;
             this.btnAdd.Text = "ADD MEMBER";
             this.btnAdd.UseVisualStyleBackColor = false;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            // 
+            // btnReminders
+            // 
+            this.btnReminders.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(91)))), ((int)(((byte)(109)))));
+            this.btnReminders.FlatAppearance.BorderSize = 0;
+            this.btnReminders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReminders.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
+            this.btnReminders.ForeColor = System.Drawing.Color.White;
+            this.btnReminders.Location = new System.Drawing.Point(588, 27);
+            this.btnReminders.Name = "btnReminders";
+            this.btnReminders.Size = new System.Drawing.Size(94, 33);
+            this.btnReminders.TabIndex = 9;
+            this.btnReminders.Text = "REMIND";
+            this.btnReminders.UseVisualStyleBackColor = false;
+            this.btnReminders.Click += new System.EventHandler(this.btnReminders_Click);
+            // 
+            // btnFreeze
+            // 
+            this.btnFreeze.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(57)))), ((int)(((byte)(130)))), ((int)(((byte)(245)))));
+            this.btnFreeze.FlatAppearance.BorderSize = 0;
+            this.btnFreeze.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFreeze.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
+            this.btnFreeze.ForeColor = System.Drawing.Color.White;
+            this.btnFreeze.Location = new System.Drawing.Point(688, 27);
+            this.btnFreeze.Name = "btnFreeze";
+            this.btnFreeze.Size = new System.Drawing.Size(101, 33);
+            this.btnFreeze.TabIndex = 10;
+            this.btnFreeze.Text = "FREEZE";
+            this.btnFreeze.UseVisualStyleBackColor = false;
+            this.btnFreeze.Click += new System.EventHandler(this.btnFreeze_Click);
             // 
             // txtSearch
             // 
@@ -272,5 +306,7 @@
         private System.Windows.Forms.Button btnArchive;
         private System.Windows.Forms.Button btnPay;
         private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Button btnReminders;
+        private System.Windows.Forms.Button btnFreeze;
     }
 }

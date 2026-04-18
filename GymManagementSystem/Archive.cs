@@ -13,11 +13,20 @@ namespace GymManagementSystem
 {
     public partial class Archive : Form
     {
+        private bool isEmbeddedMode = false;
         public Archive()
         {
             InitializeComponent();
             Resize += Archive_Resize;
             Shown += Archive_Shown;
+            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnRestore, Color.FromArgb(57, 130, 245), Color.FromArgb(80, 150, 255));
+        }
+
+        public void SetEmbeddedMode()
+        {
+            isEmbeddedMode = true;
+            btnBack.Visible = false;
         }
 
         private void Archive_Load(object sender, EventArgs e)
@@ -87,8 +96,20 @@ namespace GymManagementSystem
 
         private void btnBack_Click_2(object sender, EventArgs e)
         {
+            if (isEmbeddedMode)
+                return;
+
+            var existingDashboard = Application.OpenForms.OfType<Dashboard>().FirstOrDefault();
+            if (existingDashboard != null)
+            {
+                existingDashboard.Show();
+                existingDashboard.BringToFront();
+            }
+            else
+            {
+                new Dashboard().Show();
+            }
             this.Close();
-            new Dashboard().Show();
         }
 
         private void Archive_Shown(object sender, EventArgs e)
@@ -116,6 +137,7 @@ namespace GymManagementSystem
             label2.Location = new Point(innerMargin, rowY + 6);
             lblCount.Location = new Point(label2.Right + 12, rowY + 9);
 
+            FitButtonToText(btnRestore, 24);
             btnRestore.Location = new Point(panelBody.ClientSize.Width - innerMargin - btnRestore.Width, rowY);
             btnRestore.Height = (int)(36 * scale);
 
@@ -128,6 +150,21 @@ namespace GymManagementSystem
             label2.Font = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
             lblCount.Font = new Font("Segoe UI", 9f * scale, FontStyle.Regular);
             btnRestore.Font = new Font("Segoe UI Semibold", 10f * scale, FontStyle.Bold);
+        }
+
+        private void FitButtonToText(Button button, int horizontalPadding)
+        {
+            Size measured = TextRenderer.MeasureText(button.Text, button.Font);
+            button.Width = measured.Width + horizontalPadding;
+        }
+
+        private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = hoverColor;
+            button.FlatAppearance.MouseDownBackColor = hoverColor;
+            button.BackColor = baseColor;
         }
     }
 }

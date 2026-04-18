@@ -87,6 +87,8 @@
       <DependentUpon>Payments.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="ReceiptInfo.cs" />
+    <Compile Include="ReceiptPdfExporter.cs" />
     <Compile Include="ReceiptDialog.cs">
       <SubType>Form</SubType>
     </Compile>
