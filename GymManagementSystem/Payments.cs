@@ -24,9 +24,11 @@ namespace GymManagementSystem
             Resize += Payments_Resize;
             Shown += Payments_Shown;
             dgvPayments.DataBindingComplete += dgvPayments_DataBindingComplete;
-            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnRecordPayment, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
-            ConfigureButtonTheme(btnViewReceipt, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnBack, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnRecordPayment, ViltrumTheme.Accent, ViltrumTheme.AccentHover);
+            ConfigureButtonTheme(btnViewReceipt, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            label2.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
+            label8.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
 
         }
 
@@ -67,9 +69,11 @@ namespace GymManagementSystem
             Resize += Payments_Resize;
             Shown += Payments_Shown;
             dgvPayments.DataBindingComplete += dgvPayments_DataBindingComplete;
-            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnRecordPayment, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
-            ConfigureButtonTheme(btnViewReceipt, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnBack, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnRecordPayment, ViltrumTheme.Accent, ViltrumTheme.AccentHover);
+            ConfigureButtonTheme(btnViewReceipt, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            label2.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
+            label8.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
             // in InitializeComponent() after dgvPayments created or in Payments_Load
             this.dgvPayments.AllowUserToAddRows = false;
         }
@@ -147,11 +151,11 @@ namespace GymManagementSystem
                 case "Monthly":
                     return 800m;
                 case "Quarterly":
-                    return 2400m;
+                    return 2100m;
                 case "Semi-Annual":
-                    return 4800m;
+                    return 3800m;
                 case "Annual":
-                    return 9600m;
+                    return 6500m;
                 default:
                     decimal fallback = 0m;
                     decimal.TryParse(row["MembershipFee"]?.ToString(), out fallback);
@@ -195,7 +199,7 @@ namespace GymManagementSystem
             {
                 conn.Open();
                 string query = @"SELECT p.ReferenceNo, p.MemberName, p.Amount,
-                             p.PaymentMethod, p.PaymentDate, m.ExpiryDate, p.Status
+                             p.PaymentMethod, p.PaymentDate, m.ExpiryDate, m.[Plan], p.Status
                              FROM Payments p
                              LEFT JOIN Members m ON p.MemberID = m.MemberID
                              ORDER BY p.PaymentID DESC";
@@ -255,6 +259,8 @@ namespace GymManagementSystem
             TryGetDecimal("Amount", out decimal amount);
             string method = GetString("PaymentMethod");
             TryGetDate("PaymentDate", out DateTime date);
+            TryGetDate("ExpiryDate", out DateTime expiryDate);
+            string plan = GetString("Plan");
 
             if (string.IsNullOrWhiteSpace(refNo))
             {
@@ -269,7 +275,10 @@ namespace GymManagementSystem
                 Amount = amount,
                 PaymentMethod = method,
                 PaymentDate = date,
-                Status = "Paid"
+                Status = "Paid",
+                Plan = plan,
+                ExpiryDate = expiryDate,
+                Benefits = GetBenefitsForPlan(plan)
             });
         }
 
@@ -299,8 +308,12 @@ namespace GymManagementSystem
             DataRowView selectedMember = (DataRowView)cmbMember.SelectedItem;
             decimal expectedAmount = GetPlanAmount(selectedMember);
             int renewalMonths = GetPlanMonths(selectedMember);
+            string plan = (selectedMember["Plan"]?.ToString() ?? string.Empty).Trim();
+            DateTime renewedExpiry = DateTime.MinValue;
 
-            if (expiryDate >= DateTime.Today && isPaid)
+            // Block only for normal (today/forward) payments.
+            // If user backdates Payment Date for demo/testing, allow it.
+            if (isPaid && expiryDate >= DateTime.Today && payDate >= DateTime.Today)
             {
                 MessageBox.Show(
                     $"Cannot record payment.\nThis member is already paid and active until {expiryDate:MMMM dd, yyyy}.",
@@ -349,8 +362,8 @@ VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
                     cmd.Parameters.AddWithValue("@ref", refNo);
                     cmd.ExecuteNonQuery();
 
-                    DateTime renewalBase = expiryDate >= DateTime.Today ? expiryDate : DateTime.Today;
-                    DateTime renewedExpiry = renewalMonths > 0 ? renewalBase.AddMonths(renewalMonths) : renewalBase;
+                    // Always compute expiry from the chosen payment date so you can demo scenarios reliably.
+                    renewedExpiry = renewalMonths > 0 ? payDate.AddMonths(renewalMonths) : payDate;
 
                     // Auto-renew membership on successful payment.
                     SqlCommand upd = new SqlCommand(
@@ -360,6 +373,7 @@ VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
                               Status = CASE 
                                   WHEN IsFrozen=1 THEN 'Frozen'
                                   WHEN CAST(@newExpiry AS date) < CAST(GETDATE() AS date) THEN 'Expired'
+                                  WHEN DATEDIFF(DAY, CAST(GETDATE() AS date), CAST(@newExpiry AS date)) BETWEEN 0 AND 7 THEN 'Expiring'
                                   ELSE 'Active'
                               END
                           WHERE MemberID=@id", conn, tx);
@@ -385,7 +399,18 @@ VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
             {
                 try
                 {
-                    EmailHelper.SendReceipt(email, refNo, memberName, amount, method, payDate);
+                    EmailHelper.SendReceipt(email, new ReceiptInfo
+                    {
+                        ReferenceNo = refNo,
+                        MemberName = memberName,
+                        Amount = amount,
+                        PaymentMethod = method,
+                        PaymentDate = payDate,
+                        Status = "Paid",
+                        Plan = plan,
+                        ExpiryDate = renewedExpiry,
+                        Benefits = GetBenefitsForPlan(plan)
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -401,7 +426,25 @@ VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
 
         private void dtpPayDate_ValueChanged(object sender, EventArgs e)
         {
-            dtpPayDate.Value = DateTime.Today;
+            // Allow user to choose the payment date.
+        }
+
+        private string GetBenefitsForPlan(string plan)
+        {
+            plan = (plan ?? string.Empty).Trim();
+            switch (plan)
+            {
+                case "Monthly":
+                    return "Gym access\nUse of all equipment\nFree orientation\nFree WiFi";
+                case "Quarterly":
+                    return "Gym access\nUse of all equipment\nFree orientation\nFree WiFi\n1 guest pass";
+                case "Semi-Annual":
+                    return "Gym access\nUse of all equipment\nFree orientation\nFree WiFi\n2 guest passes";
+                case "Annual":
+                    return "Gym access\nUse of all equipment\nFree orientation\nFree WiFi\n3 guest passes\n1 month free on renewal";
+                default:
+                    return string.Empty;
+            }
         }
 
         private void Payments_Shown(object sender, EventArgs e)
@@ -448,10 +491,13 @@ VALUES (@mid, @mn, @amt, @mth, @dt, @ref, 'Paid')", conn, tx);
         private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
         {
             button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = ViltrumTheme.Border;
             button.FlatAppearance.MouseOverBackColor = hoverColor;
             button.FlatAppearance.MouseDownBackColor = hoverColor;
             button.BackColor = baseColor;
+            button.ForeColor = Color.WhiteSmoke;
+            button.Cursor = Cursors.Hand;
         }
 
         private void ApplyResponsiveLayout()

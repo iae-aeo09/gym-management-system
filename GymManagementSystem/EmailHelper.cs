@@ -15,6 +15,19 @@ namespace GymManagementSystem
 
         public static void SendReceipt(string toEmail, string refNo, string name, decimal amount, string method, DateTime paymentDate)
         {
+            SendReceipt(toEmail, new ReceiptInfo
+            {
+                ReferenceNo = refNo,
+                MemberName = name,
+                Amount = amount,
+                PaymentMethod = method,
+                PaymentDate = paymentDate,
+                Status = "Paid"
+            });
+        }
+
+        public static void SendReceipt(string toEmail, ReceiptInfo receipt)
+        {
             // FAKE EMAIL MODE
             if (!AppSettings.UseRealEmail)
             {
@@ -23,11 +36,16 @@ namespace GymManagementSystem
 
 To: {toEmail}
 
-Reference: {refNo}
-Name: {name}
-Amount: ₱{amount:N2}
-Method: {method}
-Date: {paymentDate:MMMM dd, yyyy}
+Reference: {receipt?.ReferenceNo}
+Name: {receipt?.MemberName}
+Amount: ₱{(receipt?.Amount ?? 0):N2}
+Method: {receipt?.PaymentMethod}
+Date: {(receipt?.PaymentDate ?? DateTime.Today):MMMM dd, yyyy}
+Plan: {receipt?.Plan}
+Expiry: {(receipt?.ExpiryDate == DateTime.MinValue ? "-" : receipt?.ExpiryDate.ToString("MMMM dd, yyyy"))}
+
+Benefits:
+{receipt?.Benefits}
 
 (Email not actually sent)
 ");
@@ -52,18 +70,11 @@ Date: {paymentDate:MMMM dd, yyyy}
                 }
 
                 // Generate a receipt PDF and attach it to the email.
-                tempPdfPath = Path.Combine(Path.GetTempPath(), $"Receipt-{refNo}.pdf");
-                ReceiptPdfExporter.Export(new ReceiptInfo
-                {
-                    ReferenceNo = refNo,
-                    MemberName = name,
-                    Amount = amount,
-                    PaymentMethod = method,
-                    PaymentDate = paymentDate,
-                    Status = "Paid"
-                }, tempPdfPath);
+                string refNoSafe = receipt?.ReferenceNo ?? DateTime.Now.ToString("yyyyMMddHHmmss");
+                tempPdfPath = Path.Combine(Path.GetTempPath(), $"Receipt-{refNoSafe}.pdf");
+                ReceiptPdfExporter.Export(receipt, tempPdfPath);
 
-                // Force modern TLS for Gmail
+               
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
                 using (var smtp = new SmtpClient("smtp.gmail.com", 587))
@@ -77,15 +88,17 @@ Date: {paymentDate:MMMM dd, yyyy}
                     {
                         mail.From = new MailAddress(smtpUser, "Viltrum Gym");
                         mail.To.Add(toEmail);
-                        mail.Subject = $"Payment Receipt - {refNo}";
-                        mail.Body = $@"Dear {name},
+                        mail.Subject = $"Payment Receipt - {refNoSafe}";
+                        mail.Body = $@"Dear {receipt?.MemberName},
 
 Your payment has been received.
 
-Reference: {refNo}
-Amount: ₱{amount:N2}
-Method: {method}
+Reference: {receipt?.ReferenceNo}
+Amount: ₱{(receipt?.Amount ?? 0):N2}
+Method: {receipt?.PaymentMethod}
 Status: PAID
+Plan: {receipt?.Plan}
+Expiry: {(receipt != null && receipt.ExpiryDate != DateTime.MinValue ? receipt.ExpiryDate.ToString("MMMM dd, yyyy") : "-")}
 
 Thank you for being a member!";
 

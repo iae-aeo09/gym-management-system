@@ -42,6 +42,7 @@
             this.dtpJoinDate = new System.Windows.Forms.DateTimePicker();
             this.tbExpiryDate = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
+            this.btnClearReset = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.panelBodyMember = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
@@ -60,7 +61,7 @@
             // 
             // panelTop
             // 
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(43)))), ((int)(((byte)(58)))));
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(32)))), ((int)(((byte)(42)))));
             this.panelTop.Controls.Add(this.pictureBox1);
             this.panelTop.Controls.Add(this.btnBack);
             this.panelTop.Controls.Add(this.label7);
@@ -83,7 +84,7 @@
             // 
             // btnBack
             // 
-            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(91)))), ((int)(((byte)(109)))));
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(76)))), ((int)(((byte)(94)))));
             this.btnBack.FlatAppearance.BorderSize = 0;
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
@@ -120,7 +121,7 @@
             // 
             // txtName
             // 
-            this.txtName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtName.ForeColor = System.Drawing.Color.White;
             this.txtName.Location = new System.Drawing.Point(243, 44);
@@ -130,17 +131,17 @@
             // 
             // txtPhone
             // 
-            this.txtPhone.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtPhone.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtPhone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPhone.ForeColor = System.Drawing.Color.White;
             this.txtPhone.Location = new System.Drawing.Point(243, 176);
             this.txtPhone.Name = "txtPhone";
             this.txtPhone.Size = new System.Drawing.Size(253, 22);
-            this.txtPhone.TabIndex = 1;
+            this.txtPhone.TabIndex = 3;
             // 
             // txtEmail
             // 
-            this.txtEmail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtEmail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtEmail.ForeColor = System.Drawing.Color.White;
             this.txtEmail.Location = new System.Drawing.Point(243, 132);
@@ -150,49 +151,49 @@
             // 
             // cmbPlan
             // 
-            this.cmbPlan.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.cmbPlan.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.cmbPlan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbPlan.ForeColor = System.Drawing.Color.White;
             this.cmbPlan.FormattingEnabled = true;
             this.cmbPlan.Location = new System.Drawing.Point(243, 284);
             this.cmbPlan.Name = "cmbPlan";
             this.cmbPlan.Size = new System.Drawing.Size(253, 24);
-            this.cmbPlan.TabIndex = 3;
+            this.cmbPlan.TabIndex = 6;
             this.cmbPlan.SelectedIndexChanged += new System.EventHandler(this.cmbPlan_SelectedIndexChanged_1);
             // 
             // txtFee
             // 
-            this.txtFee.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(58)))), ((int)(((byte)(76)))));
+            this.txtFee.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
             this.txtFee.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFee.ForeColor = System.Drawing.Color.Gainsboro;
             this.txtFee.Location = new System.Drawing.Point(243, 245);
             this.txtFee.Name = "txtFee";
             this.txtFee.ReadOnly = true;
             this.txtFee.Size = new System.Drawing.Size(253, 22);
-            this.txtFee.TabIndex = 4;
+            this.txtFee.TabIndex = 5;
             // 
             // dtpJoinDate
             // 
             this.dtpJoinDate.Location = new System.Drawing.Point(243, 209);
             this.dtpJoinDate.Name = "dtpJoinDate";
             this.dtpJoinDate.Size = new System.Drawing.Size(253, 22);
-            this.dtpJoinDate.TabIndex = 5;
+            this.dtpJoinDate.TabIndex = 4;
             this.dtpJoinDate.ValueChanged += new System.EventHandler(this.dtpJoinDate_ValueChanged_1);
             // 
             // tbExpiryDate
             // 
-            this.tbExpiryDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(58)))), ((int)(((byte)(76)))));
+            this.tbExpiryDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
             this.tbExpiryDate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbExpiryDate.ForeColor = System.Drawing.Color.Gainsboro;
             this.tbExpiryDate.Location = new System.Drawing.Point(243, 322);
             this.tbExpiryDate.Name = "tbExpiryDate";
             this.tbExpiryDate.ReadOnly = true;
             this.tbExpiryDate.Size = new System.Drawing.Size(253, 22);
-            this.tbExpiryDate.TabIndex = 6;
+            this.tbExpiryDate.TabIndex = 7;
             // 
             // btnSave
             // 
-            this.btnSave.BackColor = System.Drawing.Color.LimeGreen;
+            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(170)))), ((int)(((byte)(46)))), ((int)(((byte)(56)))));
             this.btnSave.FlatAppearance.BorderSize = 0;
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSave.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
@@ -200,14 +201,29 @@
             this.btnSave.Location = new System.Drawing.Point(243, 366);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(121, 34);
-            this.btnSave.TabIndex = 7;
+            this.btnSave.TabIndex = 8;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseVisualStyleBackColor = false;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // btnClearReset
+            // 
+            this.btnClearReset.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(76)))), ((int)(((byte)(94)))));
+            this.btnClearReset.FlatAppearance.BorderSize = 0;
+            this.btnClearReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearReset.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
+            this.btnClearReset.ForeColor = System.Drawing.Color.White;
+            this.btnClearReset.Location = new System.Drawing.Point(243, 366);
+            this.btnClearReset.Name = "btnClearReset";
+            this.btnClearReset.Size = new System.Drawing.Size(121, 34);
+            this.btnClearReset.TabIndex = 9;
+            this.btnClearReset.Text = "CLEAR";
+            this.btnClearReset.UseVisualStyleBackColor = false;
+            this.btnClearReset.Click += new System.EventHandler(this.btnClearReset_Click);
+            // 
             // btnCancel
             // 
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
+            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(76)))), ((int)(((byte)(94)))));
             this.btnCancel.FlatAppearance.BorderSize = 0;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
@@ -215,14 +231,14 @@
             this.btnCancel.Location = new System.Drawing.Point(375, 366);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(121, 34);
-            this.btnCancel.TabIndex = 8;
+            this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // panelBodyMember
             // 
-            this.panelBodyMember.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(52)))), ((int)(((byte)(68)))));
+            this.panelBodyMember.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(39)))), ((int)(((byte)(50)))));
             this.panelBodyMember.Controls.Add(this.label1);
             this.panelBodyMember.Controls.Add(this.label2);
             this.panelBodyMember.Controls.Add(this.label9);
@@ -240,6 +256,7 @@
             this.panelBodyMember.Controls.Add(this.tbExpiryDate);
             this.panelBodyMember.Controls.Add(this.txtExpiry);
             this.panelBodyMember.Controls.Add(this.btnSave);
+            this.panelBodyMember.Controls.Add(this.btnClearReset);
             this.panelBodyMember.Controls.Add(this.btnCancel);
             this.panelBodyMember.Location = new System.Drawing.Point(365, 156);
             this.panelBodyMember.Name = "panelBodyMember";
@@ -319,13 +336,13 @@
             // 
             // txtLastName
             // 
-            this.txtLastName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtLastName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtLastName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtLastName.ForeColor = System.Drawing.Color.White;
             this.txtLastName.Location = new System.Drawing.Point(243, 88);
             this.txtLastName.Name = "txtLastName";
             this.txtLastName.Size = new System.Drawing.Size(253, 22);
-            this.txtLastName.TabIndex = 17;
+            this.txtLastName.TabIndex = 1;
             // 
             // txtExpiry
             // 
@@ -341,7 +358,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(36)))), ((int)(((byte)(49)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(23)))), ((int)(((byte)(31)))));
             this.ClientSize = new System.Drawing.Size(1262, 673);
             this.Controls.Add(this.panelBodyMember);
             this.Controls.Add(this.panelTop);
@@ -359,6 +376,9 @@
             this.panelBodyMember.PerformLayout();
             this.ResumeLayout(false);
 
+            ViltrumTheme.Apply(this);
+            ViltrumTheme.WireCard(this.panelBodyMember, true);
+
         }
 
         #endregion
@@ -374,6 +394,7 @@
         private System.Windows.Forms.DateTimePicker dtpJoinDate;
         private System.Windows.Forms.TextBox tbExpiryDate;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnClearReset;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Panel panelBodyMember;

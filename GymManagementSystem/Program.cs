@@ -13,6 +13,7 @@ namespace GymManagementSystem
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 DBConnection.EnsureFeatureSchema();
+                DBConnection.AutoUnfreezeExpiredMembers();
                 Application.Run(new Form1());
             }
             catch (Exception ex)

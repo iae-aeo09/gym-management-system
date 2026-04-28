@@ -10,5 +10,8 @@ namespace GymManagementSystem
         public string PaymentMethod { get; set; }
         public DateTime PaymentDate { get; set; }
         public string Status { get; set; }
+        public string Plan { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public string Benefits { get; set; }
     }
 }

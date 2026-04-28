@@ -49,7 +49,7 @@
             // 
             // panelTop
             // 
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(43)))), ((int)(((byte)(58)))));
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(32)))), ((int)(((byte)(42)))));
             this.panelTop.Controls.Add(this.label4);
             this.panelTop.Controls.Add(this.lbGymTitle);
             this.panelTop.Controls.Add(this.pbIcon);
@@ -63,7 +63,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.label4.ForeColor = System.Drawing.Color.Brown;
+            this.label4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(193)))), ((int)(((byte)(96)))), ((int)(((byte)(104)))));
             this.label4.Location = new System.Drawing.Point(534, 60);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(239, 23);
@@ -73,11 +73,11 @@
             // lbGymTitle
             // 
             this.lbGymTitle.AutoSize = true;
-            this.lbGymTitle.Font = new System.Drawing.Font("Rockwell", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbGymTitle.Font = new System.Drawing.Font("Segoe UI Black", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbGymTitle.ForeColor = System.Drawing.Color.White;
             this.lbGymTitle.Location = new System.Drawing.Point(506, 14);
             this.lbGymTitle.Name = "lbGymTitle";
-            this.lbGymTitle.Size = new System.Drawing.Size(294, 46);
+            this.lbGymTitle.Size = new System.Drawing.Size(313, 54);
             this.lbGymTitle.TabIndex = 1;
             this.lbGymTitle.Text = "VILTRUM GYM";
             // 
@@ -94,7 +94,7 @@
             // 
             // panelLoginCard
             // 
-            this.panelLoginCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(57)))), ((int)(((byte)(74)))));
+            this.panelLoginCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(39)))), ((int)(((byte)(50)))));
             this.panelLoginCard.Controls.Add(this.lblCardHeader);
             this.panelLoginCard.Controls.Add(this.lbUsername);
             this.panelLoginCard.Controls.Add(this.label3);
@@ -107,7 +107,6 @@
             this.panelLoginCard.Name = "panelLoginCard";
             this.panelLoginCard.Size = new System.Drawing.Size(498, 362);
             this.panelLoginCard.TabIndex = 2;
-            this.panelLoginCard.Paint += new System.Windows.Forms.PaintEventHandler(this.panelLoginCard_Paint);
             // 
             // lblCardHeader
             // 
@@ -145,7 +144,7 @@
             // 
             // txtUsername
             // 
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txtUsername.ForeColor = System.Drawing.Color.White;
@@ -156,7 +155,7 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.txtPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(31)))), ((int)(((byte)(40)))));
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txtPassword.ForeColor = System.Drawing.Color.White;
@@ -165,6 +164,7 @@
             this.txtPassword.Size = new System.Drawing.Size(377, 32);
             this.txtPassword.TabIndex = 4;
             this.txtPassword.UseSystemPasswordChar = true;
+            this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged);
             // 
             // chkShowPassword
             // 
@@ -180,7 +180,7 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
+            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(170)))), ((int)(((byte)(46)))), ((int)(((byte)(56)))));
             this.btnLogin.FlatAppearance.BorderSize = 0;
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
@@ -206,7 +206,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(36)))), ((int)(((byte)(49)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(23)))), ((int)(((byte)(31)))));
             this.ClientSize = new System.Drawing.Size(1262, 673);
             this.Controls.Add(this.panelLoginCard);
             this.Controls.Add(this.panelTop);

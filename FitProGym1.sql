@@ -21,7 +21,7 @@ CREATE TABLE Payments (
     MemberID INT FOREIGN KEY REFERENCES Members(MemberID),
     MemberName NVARCHAR(100),
     Amount DECIMAL(10,2) NOT NULL,
-    PaymentMethod NVARCHAR(30),  -- Cash, GCash, PayPal, Bank Transfer
+    PaymentMethod NVARCHAR(30),  -- Cash, GCash, Maya, Credit Card, Bank Transfer
     PaymentDate DATE NOT NULL,
     ReferenceNo NVARCHAR(20),
     Status NVARCHAR(20) DEFAULT 'Paid',

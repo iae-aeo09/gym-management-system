@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <GenerateResourceUsePreserializedResources>false</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -89,6 +90,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="ReceiptInfo.cs" />
     <Compile Include="ReceiptPdfExporter.cs" />
+    <Compile Include="ViltrumTheme.cs" />
     <Compile Include="ReceiptDialog.cs">
       <SubType>Form</SubType>
     </Compile>

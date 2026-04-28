@@ -1,27 +1,18 @@
 ﻿using System;
+using System.Configuration;
 using System.Data.SqlClient;
 
 namespace GymManagementSystem
 {
     public class DBConnection
     {
-        private static string connStr =
-            @"Server=DESKTOP-1SFN2LH;Database=GymManagementDB;User Id=sa;Password=1945;Encrypt=False;";
+        private static readonly string connStr =
+            ConfigurationManager.ConnectionStrings["GymManagementDb"]?.ConnectionString
+            ?? @"Server=DESKTOP-1SFN2LH;Database=GymManagementDB;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
 
         public static SqlConnection GetConnection()
         {
             return new SqlConnection(connStr);
-        }
-
-        public static string GetConnectionString()
-        {
-            return connStr;
-        }
-
-        public static string GetDatabaseName()
-        {
-            var builder = new SqlConnectionStringBuilder(connStr);
-            return builder.InitialCatalog;
         }
 
         private static bool schemaEnsured = false;
@@ -37,7 +28,7 @@ namespace GymManagementSystem
 
                 using (SqlConnection conn = GetConnection())
                 {
-                    conn.Open();
+                    conn.Open(); //Freeze 
                     using (SqlCommand cmd = new SqlCommand(@"
 IF COL_LENGTH('Members', 'IsFrozen') IS NULL
     ALTER TABLE Members ADD IsFrozen BIT NOT NULL CONSTRAINT DF_Members_IsFrozen DEFAULT(0);
@@ -46,7 +37,10 @@ IF COL_LENGTH('Members', 'FrozenFrom') IS NULL
     ALTER TABLE Members ADD FrozenFrom DATE NULL;
 
 IF COL_LENGTH('Members', 'FrozenUntil') IS NULL
-    ALTER TABLE Members ADD FrozenUntil DATE NULL;
+    ALTER TABLE Members ADD FrozenUntil DATE NULL;          
+
+IF COL_LENGTH('Members', 'FreezeUsed') IS NULL
+    ALTER TABLE Members ADD FreezeUsed BIT NOT NULL CONSTRAINT DF_Members_FreezeUsed DEFAULT(0);
 
 IF OBJECT_ID('dbo.ReminderLogs', 'U') IS NULL
 BEGIN
@@ -65,6 +59,30 @@ END;", conn))
                 }
 
                 schemaEnsured = true;
+            }
+        }
+
+        public static void AutoUnfreezeExpiredMembers()
+        {
+            using (SqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(@"
+UPDATE Members
+SET IsFrozen = 0,
+    FrozenFrom = NULL,
+    FrozenUntil = NULL,
+    Status = CASE
+        WHEN CAST(ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Expired'
+        ELSE 'Active'
+    END
+WHERE IsArchived = 0
+  AND IsFrozen = 1
+  AND FrozenUntil IS NOT NULL
+  AND CAST(FrozenUntil AS date) <= CAST(GETDATE() AS date);", conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
     }

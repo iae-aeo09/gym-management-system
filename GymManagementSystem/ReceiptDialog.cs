@@ -17,6 +17,9 @@ namespace GymManagementSystem
         private Label lblMethodValue;
         private Label lblDateValue;
         private Label lblStatusValue;
+        private Label lblPlanValue;
+        private Label lblExpiryValue;
+        private Label lblBenefitsValue;
         private Button btnClose;
         private Button btnExportPdf;
         private Panel panelTop;
@@ -50,6 +53,9 @@ namespace GymManagementSystem
             this.lblMethodValue = new Label();
             this.lblDateValue = new Label();
             this.lblStatusValue = new Label();
+            this.lblPlanValue = new Label();
+            this.lblExpiryValue = new Label();
+            this.lblBenefitsValue = new Label();
             this.panelBottom = new Panel();
             this.btnClose = new Button();
             this.btnExportPdf = new Button();
@@ -60,7 +66,7 @@ namespace GymManagementSystem
             // 
             // panelTop
             // 
-            this.panelTop.BackColor = Color.FromArgb(34, 43, 58);
+            this.panelTop.BackColor = ViltrumTheme.SurfaceAlt;
             this.panelTop.Controls.Add(this.lblSubTitle);
             this.panelTop.Controls.Add(this.lblTitle);
             this.panelTop.Dock = DockStyle.Top;
@@ -92,17 +98,20 @@ namespace GymManagementSystem
             this.lblTitle.Text = "PAYMENT RECEIPT";
             // 
             // panelReceiptCard
-            this.panelReceiptCard.BackColor = Color.FromArgb(46, 57, 74);
+            this.panelReceiptCard.BackColor = ViltrumTheme.Surface;
             this.panelReceiptCard.Location = new Point(24, 100);
             this.panelReceiptCard.Name = "panelReceiptCard";
             this.panelReceiptCard.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            this.panelReceiptCard.Size = new Size(472, 240);
+            this.panelReceiptCard.Size = new Size(472, 332);
             this.panelReceiptCard.Controls.Add(CreateCaption("Reference No", 24, 24));
             this.panelReceiptCard.Controls.Add(CreateCaption("Member Name", 24, 60));
             this.panelReceiptCard.Controls.Add(CreateCaption("Amount", 24, 96));
             this.panelReceiptCard.Controls.Add(CreateCaption("Payment Method", 24, 132));
             this.panelReceiptCard.Controls.Add(CreateCaption("Payment Date", 24, 168));
             this.panelReceiptCard.Controls.Add(CreateCaption("Status", 24, 204));
+            this.panelReceiptCard.Controls.Add(CreateCaption("Plan", 24, 240));
+            this.panelReceiptCard.Controls.Add(CreateCaption("Expiry Date", 24, 276));
+            this.panelReceiptCard.Controls.Add(CreateCaption("Benefits", 24, 312));
 
             ConfigureValueLabel(this.lblRefValue, 180, 24);
             ConfigureValueLabel(this.lblMemberValue, 180, 60);
@@ -110,8 +119,10 @@ namespace GymManagementSystem
             ConfigureValueLabel(this.lblMethodValue, 180, 132);
             ConfigureValueLabel(this.lblDateValue, 180, 168);
             ConfigureValueLabel(this.lblStatusValue, 180, 204);
+            ConfigureValueLabel(this.lblPlanValue, 180, 240);
+            ConfigureValueLabel(this.lblExpiryValue, 180, 276);
 
-            this.lblStatusValue.ForeColor = Color.LightGreen;
+            this.lblStatusValue.ForeColor = Color.FromArgb(255, 166, 173);
 
             this.panelReceiptCard.Controls.Add(this.lblRefValue);
             this.panelReceiptCard.Controls.Add(this.lblMemberValue);
@@ -119,22 +130,33 @@ namespace GymManagementSystem
             this.panelReceiptCard.Controls.Add(this.lblMethodValue);
             this.panelReceiptCard.Controls.Add(this.lblDateValue);
             this.panelReceiptCard.Controls.Add(this.lblStatusValue);
+            this.panelReceiptCard.Controls.Add(this.lblPlanValue);
+            this.panelReceiptCard.Controls.Add(this.lblExpiryValue);
+
+            this.lblBenefitsValue.AutoSize = false;
+            this.lblBenefitsValue.ForeColor = Color.WhiteSmoke;
+            this.lblBenefitsValue.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
+            this.lblBenefitsValue.Location = new Point(180, 312);
+            this.lblBenefitsValue.Size = new Size(260, 78);
+            this.lblBenefitsValue.Text = "-";
+            this.panelReceiptCard.Controls.Add(this.lblBenefitsValue);
             // 
             // panelBottom
             // 
-            this.panelBottom.BackColor = Color.FromArgb(40, 50, 66);
+            this.panelBottom.BackColor = ViltrumTheme.SurfaceAlt;
             this.panelBottom.Controls.Add(this.btnClose);
             this.panelBottom.Controls.Add(this.btnExportPdf);
             this.panelBottom.Dock = DockStyle.Bottom;
-            this.panelBottom.Location = new Point(0, 356);
+            this.panelBottom.Location = new Point(0, 448);
             this.panelBottom.Name = "panelBottom";
             this.panelBottom.Size = new Size(520, 58);
             this.panelBottom.TabIndex = 2;
             // 
             // btnClose
             // 
-            this.btnClose.BackColor = Color.FromArgb(188, 44, 44);
-            this.btnClose.FlatAppearance.BorderSize = 0;
+            this.btnClose.BackColor = ViltrumTheme.SurfaceAlt;
+            this.btnClose.FlatAppearance.BorderSize = 1;
+            this.btnClose.FlatAppearance.BorderColor = ViltrumTheme.Border;
             this.btnClose.FlatStyle = FlatStyle.Flat;
             this.btnClose.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
             this.btnClose.ForeColor = Color.White;
@@ -149,8 +171,9 @@ namespace GymManagementSystem
             // 
             // btnExportPdf
             // 
-            this.btnExportPdf.BackColor = Color.FromArgb(80, 91, 109);
-            this.btnExportPdf.FlatAppearance.BorderSize = 0;
+            this.btnExportPdf.BackColor = ViltrumTheme.Accent;
+            this.btnExportPdf.FlatAppearance.BorderSize = 1;
+            this.btnExportPdf.FlatAppearance.BorderColor = ViltrumTheme.Border;
             this.btnExportPdf.FlatStyle = FlatStyle.Flat;
             this.btnExportPdf.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
             this.btnExportPdf.ForeColor = Color.White;
@@ -166,8 +189,8 @@ namespace GymManagementSystem
             // 
             this.AutoScaleDimensions = new SizeF(8F, 16F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(28, 36, 49);
-            this.ClientSize = new Size(520, 414);
+            this.BackColor = ViltrumTheme.AppBackground;
+            this.ClientSize = new Size(520, 506);
             this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.panelReceiptCard);
             this.Controls.Add(this.panelTop);
@@ -183,6 +206,9 @@ namespace GymManagementSystem
             this.panelReceiptCard.ResumeLayout(false);
             this.panelBottom.ResumeLayout(false);
             this.ResumeLayout(false);
+
+            ViltrumTheme.Apply(this);
+            ViltrumTheme.WireCard(this.panelReceiptCard, true);
         }
 
         private Label CreateCaption(string text, int x, int y)
@@ -219,6 +245,9 @@ namespace GymManagementSystem
                 ? "-"
                 : receipt.PaymentDate.ToString("MMMM dd, yyyy");
             lblStatusValue.Text = string.IsNullOrWhiteSpace(receipt.Status) ? "Paid" : receipt.Status;
+            lblPlanValue.Text = string.IsNullOrWhiteSpace(receipt.Plan) ? "-" : receipt.Plan;
+            lblExpiryValue.Text = receipt.ExpiryDate == DateTime.MinValue ? "-" : receipt.ExpiryDate.ToString("MMMM dd, yyyy");
+            lblBenefitsValue.Text = string.IsNullOrWhiteSpace(receipt.Benefits) ? "-" : receipt.Benefits;
         }
 
         private void btnClose_Click(object sender, EventArgs e)

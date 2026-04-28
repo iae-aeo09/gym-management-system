@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace GymManagementSystem
@@ -11,7 +11,6 @@ namespace GymManagementSystem
         private readonly Panel panelContentHost;
         private readonly Label lblAnalytics;
         private readonly ComboBox cmbDateFilter;
-        private readonly Button btnBackupDb;
         private Form activeContentForm;
 
         public Dashboard()
@@ -19,10 +18,10 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += Dashboard_Resize;
             Shown += Dashboard_Shown;
-            ConfigureButtonTheme(btnGoMembers, System.Drawing.Color.FromArgb(80, 91, 109), System.Drawing.Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnGoPayments, System.Drawing.Color.FromArgb(80, 91, 109), System.Drawing.Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnGoArchive, System.Drawing.Color.FromArgb(80, 91, 109), System.Drawing.Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnLogout, System.Drawing.Color.FromArgb(188, 44, 44), System.Drawing.Color.FromArgb(210, 60, 60));
+            ConfigureButtonTheme(btnGoMembers, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnGoPayments, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnGoArchive, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnLogout, ViltrumTheme.Danger, ViltrumTheme.DangerHover);
 
             panelContentHost = new Panel
             {
@@ -47,8 +46,8 @@ namespace GymManagementSystem
             cmbDateFilter = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                BackColor = System.Drawing.Color.FromArgb(58, 69, 88),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = ViltrumTheme.Input,
+                ForeColor = ViltrumTheme.TextPrimary,
                 FlatStyle = FlatStyle.Flat
             };
             cmbDateFilter.Items.AddRange(new object[] { "Today", "Last 7 Days", "This Month", "All Time" });
@@ -57,29 +56,37 @@ namespace GymManagementSystem
             panelStats.Controls.Add(cmbDateFilter);
             cmbDateFilter.BringToFront();
 
-            btnBackupDb = new Button
-            {
-                Text = "Backup DB",
-                ForeColor = System.Drawing.Color.White
-            };
-            ConfigureButtonTheme(btnBackupDb, System.Drawing.Color.FromArgb(57, 130, 245), System.Drawing.Color.FromArgb(80, 150, 255));
-            btnBackupDb.Click += btnBackupDb_Click;
-            panelNav.Controls.Add(btnBackupDb);
-            btnBackupDb.BringToFront();
-
             label3.Cursor = Cursors.Hand;
             label3.Click += (s, e) => ShowDashboardHome();
+            label3.ForeColor = ViltrumTheme.TextPrimary;
+            label3.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            label4.ForeColor = ViltrumTheme.TextMuted;
+            label2.ForeColor = ViltrumTheme.TextMuted;
+            label9.ForeColor = ViltrumTheme.TextMuted;
+
+            // Stronger gym-style header typography (override designer font).
+            label4.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold);
+            label2.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold);
+            label9.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold);
+
+            // Expiry alert text should wrap and stay fully visible.
+            pnlExpiryAlert.Padding = new Padding(12, 8, 12, 8);
+            lblExpiryMessage.AutoSize = false;
+            lblExpiryMessage.Dock = DockStyle.Fill;
+            lblExpiryMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            lblExpiryMessage.MaximumSize = new System.Drawing.Size(0, 0);
         }
 
         private void Dashboard_Load(object sender, EventArgs e)
         {
             DBConnection.EnsureFeatureSchema();
+            DBConnection.AutoUnfreezeExpiredMembers();
             LoadStats();
             LoadRecentPayments();
             CheckExpiringMemberships();
             LoadAnalytics();
         }
-
+        //Show Members
         private void LoadStats()
         {
             using (SqlConnection conn = DBConnection.GetConnection())
@@ -111,24 +118,40 @@ namespace GymManagementSystem
             SqlCommand cmd = new SqlCommand(query, conn);
             return cmd.ExecuteScalar();
         }
-
+        //Show Recent Payments
         private void LoadRecentPayments()
         {
             using (SqlConnection conn = DBConnection.GetConnection())
             {
                 conn.Open();
                 string dateFilter = GetPaymentsDateFilterSql();
-                string query = @"SELECT TOP 5 ReferenceNo, MemberName, Amount, 
-                             PaymentMethod, PaymentDate, Status 
-                             FROM Payments
-                             WHERE " + dateFilter + @" ORDER BY PaymentID DESC";
+                string query = @"
+SELECT TOP 5
+    p.ReferenceNo,
+    p.MemberName,
+    p.Amount,
+    p.PaymentMethod,
+    p.PaymentDate,
+    m.ExpiryDate,
+    CASE
+        WHEN m.MemberID IS NULL THEN ISNULL(p.Status, 'Paid')
+        WHEN m.IsFrozen = 1 THEN 'Frozen'
+        WHEN CAST(m.ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Expired - Inactive'
+        WHEN DATEDIFF(DAY, CAST(GETDATE() AS date), CAST(m.ExpiryDate AS date)) BETWEEN 0 AND 7
+            THEN CASE WHEN m.IsPaid = 1 THEN 'Expiring - Paid' ELSE 'Expiring - Unpaid' END
+        ELSE CASE WHEN m.IsPaid = 1 THEN 'Active - Paid' ELSE 'Active - Unpaid' END
+    END AS Status
+FROM Payments p
+LEFT JOIN Members m ON p.MemberID = m.MemberID
+WHERE " + dateFilter + @"
+ORDER BY p.PaymentID DESC";
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 dgvRecentPayments.DataSource = dt;
             }
         }
-
+        //Check Expiring Members
         private void CheckExpiringMemberships()
         {
             pnlExpiryAlert.Visible = false;
@@ -177,8 +200,9 @@ namespace GymManagementSystem
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
-            new Form1().Show();
-            this.Close();
+            Form1 form1 = new Form1();
+            form1.Show();
+            this.Hide();
         }
 
         private void pnlExpiryAlert_Paint(object sender, PaintEventArgs e)
@@ -201,14 +225,26 @@ namespace GymManagementSystem
             int contentLeft = panelNav.Right + 12;
             int contentRight = ClientSize.Width - 12;
             int contentWidth = System.Math.Max(860, contentRight - contentLeft);
+            int sectionGap = 10;
             int navButtonWidth = Math.Max(128, panelNav.Width - 56);
+            int navX = (panelNav.Width - navButtonWidth) / 2;
+            int navTop = 18;
+            int navGap = 10;
+            int navBtnH = 44;
 
+            panelStats.Top = panelTop.Bottom + 12;
             panelStats.Left = contentLeft;
             panelStats.Width = contentWidth;
+
             pnlExpiryAlert.Left = contentLeft;
             pnlExpiryAlert.Width = contentWidth;
+            pnlExpiryAlert.Top = panelStats.Bottom + sectionGap;
+            pnlExpiryAlert.Height = 58;
+
             panelGrid.Left = contentLeft;
             panelGrid.Width = contentWidth;
+            panelGrid.Top = (pnlExpiryAlert.Visible ? pnlExpiryAlert.Bottom : panelStats.Bottom) + sectionGap;
+            panelGrid.Height = Math.Max(220, ClientSize.Height - panelGrid.Top - 12);
 
             panelContentHost.Left = contentLeft;
             panelContentHost.Top = panelStats.Top;
@@ -216,19 +252,28 @@ namespace GymManagementSystem
             panelContentHost.Height = ClientSize.Height - panelStats.Top - 12;
 
             label3.Width = navButtonWidth;
-            label3.Left = (panelNav.Width - label3.Width) / 2;
+            label3.Height = 46;
+            label3.Left = navX;
+            label3.Top = navTop;
+
             btnGoMembers.Width = navButtonWidth;
             btnGoPayments.Width = navButtonWidth;
             btnGoArchive.Width = navButtonWidth;
             btnLogout.Width = navButtonWidth;
-            btnGoMembers.Left = (panelNav.Width - btnGoMembers.Width) / 2;
-            btnGoPayments.Left = btnGoMembers.Left;
-            btnGoArchive.Left = btnGoMembers.Left;
-            btnLogout.Left = btnGoMembers.Left;
-            btnBackupDb.Width = navButtonWidth;
-            btnBackupDb.Height = btnGoMembers.Height;
-            btnBackupDb.Left = btnGoMembers.Left;
-            btnBackupDb.Top = btnLogout.Bottom + 14;
+            btnGoMembers.Left = navX;
+            btnGoPayments.Left = navX;
+            btnGoArchive.Left = navX;
+            btnLogout.Left = navX;
+
+            btnGoMembers.Height = navBtnH;
+            btnGoPayments.Height = navBtnH;
+            btnGoArchive.Height = navBtnH;
+            btnLogout.Height = navBtnH;
+
+            btnGoMembers.Top = label3.Bottom + 18;
+            btnGoPayments.Top = btnGoMembers.Bottom + navGap;
+            btnGoArchive.Top = btnGoPayments.Bottom + navGap;
+            btnLogout.Top = panelNav.ClientSize.Height - btnLogout.Height - 18;
 
             // Center the quote block in header.
             int quoteGap = 6;
@@ -238,20 +283,33 @@ namespace GymManagementSystem
             label2.Left = label4.Right + quoteGap;
             label9.Left = Math.Max(pbIcon.Right + 24, (panelTop.ClientSize.Width - label9.Width) / 2);
 
-            int statSegment = panelStats.ClientSize.Width / 4;
-            PositionStat(label1, lblTotalMembers, statSegment, 0);
-            PositionStat(label5, lblActive, statSegment, 1);
-            PositionStat(label6, lblExpired, statSegment, 2);
-            PositionStat(label7, lblRevenue, statSegment, 3);
             cmbDateFilter.Width = 150;
             cmbDateFilter.Height = 26;
             cmbDateFilter.Left = panelStats.ClientSize.Width - cmbDateFilter.Width - 16;
             cmbDateFilter.Top = 14;
 
+            // Stats row: reserve space for the date filter so it doesn't collide with Revenue.
+            int statsLeftPad = 24;
+            int statsRightPad = 16;
+            int filterReserved = cmbDateFilter.Width + 16;
+            int statsAreaWidth = Math.Max(520, panelStats.ClientSize.Width - statsLeftPad - statsRightPad - filterReserved);
+            int statSegment = statsAreaWidth / 4;
+            int statsStartX = statsLeftPad;
+            PositionStat(label1, lblTotalMembers, statsStartX, statSegment, 0);
+            PositionStat(label5, lblActive, statsStartX, statSegment, 1);
+            PositionStat(label6, lblExpired, statsStartX, statSegment, 2);
+            PositionStat(label7, lblRevenue, statsStartX, statSegment, 3);
+
+            label8.Left = 24;
+            label8.Top = 16;
+
             lblAnalytics.Left = 24;
-            lblAnalytics.Top = 20;
+            lblAnalytics.Top = label8.Bottom + 4;
+
+            dgvRecentPayments.Left = 24;
             dgvRecentPayments.Top = lblAnalytics.Bottom + 8;
-            dgvRecentPayments.Height = panelGrid.ClientSize.Height - dgvRecentPayments.Top - 20;
+            dgvRecentPayments.Width = panelGrid.ClientSize.Width - 48;
+            dgvRecentPayments.Height = panelGrid.ClientSize.Height - dgvRecentPayments.Top - 16;
         }
 
         private void ShowEmbeddedContent(Form form)
@@ -427,50 +485,35 @@ WHERE m.IsArchived=0
             LoadAnalytics();
         }
 
-        private void btnBackupDb_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string dbName = DBConnection.GetDatabaseName();
-                string backupDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GymBackups");
-                Directory.CreateDirectory(backupDir);
-                string backupFile = Path.Combine(backupDir, $"{dbName}-{DateTime.Now:yyyyMMdd-HHmmss}.bak");
-
-                using (SqlConnection conn = new SqlConnection(DBConnection.GetConnectionString()))
-                {
-                    conn.Open();
-                    string sql = $"BACKUP DATABASE [{dbName}] TO DISK = @path WITH INIT, STATS = 10";
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@path", backupFile);
-                        cmd.CommandTimeout = 120;
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                MessageBox.Show($"Database backup created:\n{backupFile}", "Backup Complete");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Backup failed: " + ex.Message, "Backup Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void PositionStat(Label caption, Label value, int width, int index)
         {
-            int startX = (width * index) + 20;
-            caption.Left = startX;
-            value.Left = startX;
+            PositionStat(caption, value, 20, width, index);
+        }
+
+        private void PositionStat(Label caption, Label value, int startX, int width, int index)
+        {
+            int x = startX + (width * index);
+            int captionY = 18;
+            int valueY = 48;
+
+            caption.Top = captionY;
+            value.Top = valueY;
+
+            // Center within segment for clean alignment.
+            caption.Left = x + Math.Max(0, (width - caption.Width) / 2);
+            value.Left = x + Math.Max(0, (width - value.Width) / 2);
         }
 
         private void ConfigureButtonTheme(Button button, System.Drawing.Color baseColor, System.Drawing.Color hoverColor)
         {
             button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = ViltrumTheme.Border;
             button.FlatAppearance.MouseOverBackColor = hoverColor;
             button.FlatAppearance.MouseDownBackColor = hoverColor;
             button.BackColor = baseColor;
+            button.ForeColor = System.Drawing.Color.WhiteSmoke;
+            button.Cursor = Cursors.Hand;
         }
 
         private void lblActive_Click(object sender, EventArgs e)

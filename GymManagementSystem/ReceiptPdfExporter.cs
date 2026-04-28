@@ -33,12 +33,12 @@ namespace GymManagementSystem
             content.AppendLine("(" + EscapePdfText("Official Payment Receipt") + ") Tj");
             content.AppendLine("ET");
 
-            // White card body
+            // White card body (taller to fit plan/expiry/benefits cleanly)
             content.AppendLine("1 1 1 rg");
-            content.AppendLine("40 488 515 272 re f");
+            content.AppendLine("40 430 515 330 re f");
             content.AppendLine("0.84 0.86 0.9 RG");
             content.AppendLine("1 w");
-            content.AppendLine("40 488 515 272 re S");
+            content.AppendLine("40 430 515 330 re S");
 
             // Two-column receipt details
             string amountText = "PHP " + receipt.Amount.ToString("N2", CultureInfo.InvariantCulture);
@@ -46,6 +46,12 @@ namespace GymManagementSystem
                 ? "-"
                 : receipt.PaymentDate.ToString("MMMM dd, yyyy");
             string statusText = string.IsNullOrWhiteSpace(receipt.Status) ? "Paid" : receipt.Status;
+            string planText = string.IsNullOrWhiteSpace(receipt.Plan) ? "-" : receipt.Plan;
+            string expiryText = receipt.ExpiryDate == DateTime.MinValue ? "-" : receipt.ExpiryDate.ToString("MMMM dd, yyyy");
+            string benefitsText = string.IsNullOrWhiteSpace(receipt.Benefits)
+                ? "-"
+                : receipt.Benefits.Replace("\r", "").Replace("\n", ", ");
+            if (benefitsText.Length > 95) benefitsText = benefitsText.Substring(0, 92) + "...";
 
             string[,] rows = new[,]
             {
@@ -54,7 +60,10 @@ namespace GymManagementSystem
                 { "Amount", amountText },
                 { "Method", Safe(receipt.PaymentMethod) },
                 { "Payment Date", dateText },
-                { "Status", statusText }
+                { "Status", statusText },
+                { "Plan", planText },
+                { "Expiry Date", expiryText },
+                { "Benefits", benefitsText }
             };
 
             int rowY = 734;
@@ -87,14 +96,15 @@ namespace GymManagementSystem
                     content.AppendLine("S");
                 }
 
-                rowY -= 38;
+                rowY -= 30;
             }
 
-            // Footer
+            // Footer (always below details block)
+            int footerY = Math.Max(438, rowY - 10);
             content.AppendLine("BT");
             content.AppendLine("0.35 0.39 0.45 rg");
             content.AppendLine("/F1 10 Tf");
-            content.AppendLine("56 510 Td");
+            content.AppendLine("56 " + footerY + " Td");
             content.AppendLine("(" + EscapePdfText("Thank you for your payment.") + ") Tj");
             content.AppendLine("ET");
 

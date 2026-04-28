@@ -19,8 +19,9 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += Archive_Resize;
             Shown += Archive_Shown;
-            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnRestore, Color.FromArgb(57, 130, 245), Color.FromArgb(80, 150, 255));
+            ConfigureButtonTheme(btnBack, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnRestore, ViltrumTheme.Accent, ViltrumTheme.AccentHover);
+            label2.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
         }
 
         public void SetEmbeddedMode()
@@ -161,10 +162,13 @@ namespace GymManagementSystem
         private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
         {
             button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = ViltrumTheme.Border;
             button.FlatAppearance.MouseOverBackColor = hoverColor;
             button.FlatAppearance.MouseDownBackColor = hoverColor;
             button.BackColor = baseColor;
+            button.ForeColor = Color.WhiteSmoke;
+            button.Cursor = Cursors.Hand;
         }
     }
 }

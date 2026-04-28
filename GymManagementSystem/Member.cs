@@ -13,7 +13,6 @@ namespace GymManagementSystem
 {
     public partial class Member : Form
     {
-        private int memberId = 0;
         private bool isEmbeddedMode = false;
         private Action sendReminderAction;
         private Action<int> openPaymentsAction;
@@ -24,13 +23,14 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += Member_Resize;
             Shown += Member_Shown;
-            ConfigureButtonTheme(btnBack, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnAdd, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnUpdate, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnPay, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
-            ConfigureButtonTheme(btnArchive, Color.Crimson, Color.FromArgb(210, 50, 88));
-            ConfigureButtonTheme(btnFreeze, Color.FromArgb(57, 130, 245), Color.FromArgb(80, 150, 255));
-            ConfigureButtonTheme(btnReminders, Color.FromArgb(80, 91, 109), Color.FromArgb(95, 108, 129));
+            ConfigureButtonTheme(btnBack, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnAdd, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnUpdate, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnPay, ViltrumTheme.Accent, ViltrumTheme.AccentHover);
+            ConfigureButtonTheme(btnArchive, ViltrumTheme.Danger, ViltrumTheme.DangerHover);
+            ConfigureButtonTheme(btnFreeze, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            ConfigureButtonTheme(btnReminders, ViltrumTheme.SurfaceAlt, ViltrumTheme.Accent);
+            label2.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
             dgvMembers.SelectionChanged += dgvMembers_SelectionChanged;
             dgvMembers.DataBindingComplete += dgvMembers_DataBindingComplete;
 
@@ -50,7 +50,18 @@ namespace GymManagementSystem
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
             };
-            cmbStatusFilter.Items.AddRange(new object[] { "All", "Active", "Expired", "Frozen", "Paid", "Unpaid" });
+            cmbStatusFilter.Items.AddRange(new object[]
+            {
+                "All",
+                "Active - Paid",
+                "Active - Unpaid",
+                "Expiring - Paid",
+                "Expiring - Unpaid",
+                "Expired - Inactive",
+                "Frozen",
+                "Paid",
+                "Unpaid"
+            });
             cmbStatusFilter.SelectedIndex = 0;
             cmbStatusFilter.SelectedIndexChanged += FilterChanged;
             panelBody.Controls.Add(cmbStatusFilter);
@@ -77,22 +88,29 @@ namespace GymManagementSystem
         private void Member_Load(object sender, EventArgs e)
         {
             DBConnection.EnsureFeatureSchema();
+            DBConnection.AutoUnfreezeExpiredMembers();
             LoadMembers();
         }
-        public void LoadMembers(string search = "")
+        public void LoadMembers(string search = "") //Get Members
         {
             using (SqlConnection conn = DBConnection.GetConnection())
             {
                 conn.Open();
                 string query = @"
 SELECT MemberID, FullName, Email, Phone, [Plan], 
-       MembershipFee, JoinDate, ExpiryDate, IsFrozen, FrozenFrom, FrozenUntil,
+       MembershipFee, JoinDate, ExpiryDate, IsFrozen, FrozenFrom, FrozenUntil, FreezeUsed,
        CASE
            WHEN IsFrozen = 1 THEN 'Frozen'
-           WHEN CAST(ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Expired'
-           ELSE 'Active'
+           WHEN CAST(ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Expired - Inactive'
+           WHEN DATEDIFF(DAY, CAST(GETDATE() AS date), CAST(ExpiryDate AS date)) BETWEEN 0 AND 7
+               THEN CASE WHEN IsPaid = 1 THEN 'Expiring - Paid' ELSE 'Expiring - Unpaid' END
+           ELSE CASE WHEN IsPaid = 1 THEN 'Active - Paid' ELSE 'Active - Unpaid' END
        END AS [Status],
-       CASE WHEN IsPaid=1 THEN 'Paid' ELSE 'Unpaid' END AS Payment
+       CASE
+           WHEN CAST(ExpiryDate AS date) < CAST(GETDATE() AS date) THEN 'Unpaid'
+           WHEN IsPaid=1 THEN 'Paid'
+           ELSE 'Unpaid'
+       END AS Payment
 FROM Members
 WHERE IsArchived=0
   AND (FullName LIKE @s OR Email LIKE @s)
@@ -115,6 +133,7 @@ ORDER BY MemberID DESC";
                 if (dgvMembers.Columns.Contains("IsFrozen")) dgvMembers.Columns["IsFrozen"].Visible = false;
                 if (dgvMembers.Columns.Contains("FrozenFrom")) dgvMembers.Columns["FrozenFrom"].Visible = false;
                 if (dgvMembers.Columns.Contains("FrozenUntil")) dgvMembers.Columns["FrozenUntil"].Visible = false;
+                if (dgvMembers.Columns.Contains("FreezeUsed")) dgvMembers.Columns["FreezeUsed"].Visible = false;
                 lblMemberCount.Text = $"Total: {dt.Rows.Count} members";
                 UpdateFreezeButtonState();
             }
@@ -161,7 +180,26 @@ ORDER BY MemberID DESC";
                 return;
             }
 
-            int id = Convert.ToInt32(dgvMembers.SelectedRows[0].Cells["MemberID"].Value);
+            var row = dgvMembers.SelectedRows[0];
+            int id = Convert.ToInt32(row.Cells["MemberID"].Value);
+
+            // Allow renew/update only if membership is expired.
+            DateTime expiry = DateTime.MinValue;
+            bool hasExpiry = dgvMembers.Columns.Contains("ExpiryDate")
+                             && DateTime.TryParse(row.Cells["ExpiryDate"].Value?.ToString(), out expiry);
+            bool isExpired = hasExpiry && expiry.Date < DateTime.Today;
+
+            if (!isExpired)
+            {
+                string untilText = hasExpiry ? expiry.ToString("MMMM dd, yyyy") : "N/A";
+                MessageBox.Show(
+                    "Cannot renew/update this member yet.\n" +
+                    $"Membership is still active until: {untilText}",
+                    "Renew Blocked",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
 
             using (AddEditMember form = new AddEditMember(id))
             {
@@ -263,6 +301,7 @@ ORDER BY MemberID DESC";
             int id = Convert.ToInt32(selected.Cells["MemberID"].Value);
             string name = selected.Cells["FullName"].Value?.ToString() ?? string.Empty;
             bool isFrozen = ToBool(selected.Cells["IsFrozen"].Value);
+            bool freezeUsed = dgvMembers.Columns.Contains("FreezeUsed") && ToBool(selected.Cells["FreezeUsed"].Value);
 
             if (isFrozen)
             {
@@ -270,10 +309,17 @@ ORDER BY MemberID DESC";
                 return;
             }
 
-            int? days = PromptFreezeDays();
-            if (!days.HasValue) return;
+            if (freezeUsed)
+            {
+                MessageBox.Show(
+                    $"{name} has already used the one-time freeze option.",
+                    "Freeze Not Allowed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
 
-            FreezeMember(id, name, days.Value);
+            FreezeMember(id, name, 7);
         }
 
         private void FreezeMember(int memberIdToFreeze, string memberName, int days)
@@ -287,6 +333,7 @@ ORDER BY MemberID DESC";
                     SqlCommand cmd = new SqlCommand(@"
 UPDATE Members
 SET IsFrozen = 1,
+    FreezeUsed = 1,
     FrozenFrom = CAST(GETDATE() AS date),
     FrozenUntil = DATEADD(day, @days, CAST(GETDATE() AS date)),
     ExpiryDate = DATEADD(day, @days, ExpiryDate),
@@ -420,9 +467,13 @@ WHERE MemberID = @id;", conn, tx);
             {
                 if (row.IsNewRow) continue;
                 string status = row.Cells["Status"]?.Value?.ToString() ?? string.Empty;
-                if (status == "Expired")
+                if (status.StartsWith("Expired"))
                 {
                     row.DefaultCellStyle.BackColor = Color.FromArgb(96, 50, 58);
+                }
+                else if (status.StartsWith("Expiring"))
+                {
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(96, 86, 40);
                 }
                 else if (status == "Frozen")
                 {
@@ -436,12 +487,16 @@ WHERE MemberID = @id;", conn, tx);
             if (dgvMembers.SelectedRows.Count == 0)
             {
                 btnFreeze.Text = "FREEZE";
+                btnFreeze.Enabled = false;
                 return;
             }
 
             DataGridViewRow row = dgvMembers.SelectedRows[0];
             bool isFrozen = dgvMembers.Columns.Contains("IsFrozen") && ToBool(row.Cells["IsFrozen"].Value);
+            bool freezeUsed = dgvMembers.Columns.Contains("FreezeUsed") && ToBool(row.Cells["FreezeUsed"].Value);
+
             btnFreeze.Text = isFrozen ? "UNFREEZE" : "FREEZE";
+            btnFreeze.Enabled = isFrozen || !freezeUsed;
             ApplyResponsiveLayout();
         }
 
@@ -597,10 +652,13 @@ WHERE m.IsArchived=0
         private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
         {
             button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = ViltrumTheme.Border;
             button.FlatAppearance.MouseOverBackColor = hoverColor;
             button.FlatAppearance.MouseDownBackColor = hoverColor;
             button.BackColor = baseColor;
+            button.ForeColor = Color.WhiteSmoke;
+            button.Cursor = Cursors.Hand;
         }
     }
 }

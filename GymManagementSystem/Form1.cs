@@ -19,7 +19,8 @@ namespace GymManagementSystem
             InitializeComponent();
             Resize += Form1_Resize;
             Shown += Form1_Shown;
-            ConfigureButtonTheme(btnLogin, Color.FromArgb(188, 44, 44), Color.FromArgb(210, 60, 60));
+            ConfigureButtonTheme(btnLogin, ViltrumTheme.Accent, ViltrumTheme.AccentHover);
+            AcceptButton = btnLogin;
         }
 
         
@@ -39,12 +40,11 @@ namespace GymManagementSystem
             {
                 conn.Open();
 
-                // If your DB actually stores a password hash, change this to SELECT PasswordHash and verify the hash.
                 string query = "SELECT COUNT(*) FROM Users WHERE Username=@u AND PasswordHash=@p";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@u", username);
-                    cmd.Parameters.AddWithValue("@p", password); // only ok if DB stores plaintext (not recommended)
+                    cmd.Parameters.AddWithValue("@p", password);
 
                     int result = (int)cmd.ExecuteScalar();
 
@@ -58,7 +58,9 @@ namespace GymManagementSystem
                         }
                         else
                         {
-                            new Dashboard().Show();
+                            var dashboard = new Dashboard();
+                            dashboard.FormClosed += (s, args) => this.Close();
+                            dashboard.Show();
                         }
                         this.Hide();
                     }
@@ -147,11 +149,6 @@ namespace GymManagementSystem
             return Math.Min(max, Math.Max(min, value));
         }
 
-        private void panelLoginCard_Paint(object sender, PaintEventArgs e)
-        {
-            // Intentionally empty: dynamic centering is handled via form resize events.
-        }
-
         private void pbIcon_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -160,10 +157,26 @@ namespace GymManagementSystem
         private void ConfigureButtonTheme(Button button, Color baseColor, Color hoverColor)
         {
             button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = ViltrumTheme.Border;
             button.FlatAppearance.MouseOverBackColor = hoverColor;
             button.FlatAppearance.MouseDownBackColor = hoverColor;
             button.BackColor = baseColor;
+            button.ForeColor = Color.WhiteSmoke;
+            button.Cursor = Cursors.Hand;
+        }
+
+        public void PrepareForRelogin()
+        {
+            txtPassword.Clear();
+            chkShowPassword.Checked = false;
+            txtPassword.UseSystemPasswordChar = true;
+            txtUsername.Focus();
+        }
+
+        private void txtPassword_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
